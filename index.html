@@ -3,213 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Meu App de Táxi Profissional</title>
-    
+    <title>Meu App de Táxi Real</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <style>
-        :root {
-            --cor-principal: #FFD700; 
-            --cor-botao: #000000;
-        }
+        :root { --amarelo: #FFD700; --preto: #000; }
+        body { font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        #map { flex: 1; width: 100%; }
+        
+        .header-busca { position: absolute; top: 15px; width: 90%; left: 5%; z-index: 1000; }
+        .input-busca { width: 100%; padding: 15px; border-radius: 25px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); outline: none; }
 
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background-color: #f5f5f5;
-        }
-
-        .header-busca {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            z-index: 1000;
-        }
-
-        .input-busca {
-            width: 100%;
-            padding: 15px 20px;
-            border-radius: 30px;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        #map { width: 100%; flex: 1; z-index: 1; }
-
-        .painel-viagem {
-            background: white;
-            padding: 20px;
-            border-radius: 25px 25px 0 0;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-            z-index: 10;
-            margin-top: -25px;
-        }
-
-        .titulo-painel {
-            font-weight: bold;
-            font-size: 12px;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .opcao-carro {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border: 2px solid #f0f0f0;
-            border-radius: 15px;
-            margin-bottom: 12px;
-        }
-
-        .opcao-carro.selecionado {
-            border-color: var(--cor-principal);
-            background-color: #fffef0;
-        }
-
-        .carro-img { width: 55px; margin-right: 15px; }
-        .info-carro { flex: 1; }
-        .info-carro strong { display: block; font-size: 17px; }
-        .info-carro span { color: #666; font-size: 13px; }
+        .painel { background: white; padding: 20px; border-radius: 20px 20px 0 0; z-index: 10; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); }
+        .opcao { display: flex; align-items: center; padding: 15px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
+        .opcao.selecionada { border-color: var(--amarelo); background: #fffdf0; }
+        .info { flex: 1; margin-left: 15px; }
         .preco { font-weight: bold; font-size: 18px; }
-
-        .btn-chamar {
-            width: 100%;
-            background-color: var(--cor-botao);
-            color: #fff;
-            padding: 18px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            border: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
+        .btn { width: 100%; background: var(--preto); color: white; padding: 15px; border-radius: 12px; border: none; font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <div class="header-busca">
-        <input type="text" class="input-busca" placeholder="Para onde vamos?">
-    </div>
-
+    <div class="header-busca"><input type="text" class="input-busca" placeholder="Para onde vamos?"></div>
     <div id="map"></div>
 
-    <div class="painel-viagem">
-        <span class="titulo-painel">Escolha sua viagem</span>
-        
-        <div class="opcao-carro selecionado">
-            <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" class="carro-img">
-            <div class="info-carro">
-                <strong>Táxi Econômico</strong>
-                <span>4 min • Chegada 19:10</span>
-            </div>
-            <div class="preco">R$ 14,90</div>
+    <div class="painel">
+        <div id="eco" class="opcao selecionada" onclick="selecionar('eco', 2.50)">
+            <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" width="40">
+            <div class="info"><strong>Econômico</strong><br><small>3 min</small></div>
+            <div class="preco" id="preco-eco">R$ 0,00</div>
         </div>
 
-        <div class="opcao-carro">
-            <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" class="carro-img">
-            <div class="info-carro">
-                <strong>Táxi Conforto</strong>
-                <span>6 min • Chegada 19:12</span>
-            </div>
-            <div class="preco">R$ 22,50</div>
+        <div id="black" class="opcao" onclick="selecionar('black', 4.80)">
+            <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" width="40">
+            <div class="info"><strong>Black</strong><br><small>6 min</small></div>
+            <div class="preco" id="preco-black">R$ 0,00</div>
         </div>
-
-        <button class="btn-chamar" onclick="solicitar()">Solicitar Viagem</button>
+        <button class="btn" onclick="chamar()">Confirmar Viagem</button>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Coordenadas iniciais: Focando nas vias expressas de Brasília
-        var latInicial = -15.793, lngInicial = -47.882;
-        var map = L.map('map', { zoomControl: false }).setView([latInicial, lngInicial], 15);
-        var marcadorDestino, linhaRota, marcadorUsuario;
+        var map = L.map('map', {zoomControl: false}).setView([-5.52, -47.47], 13);
+        var mUsuario, mDestino, rota, km = 0, taxa = 2.50;
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Ícone clássico para o usuário ("Você está aqui")
-        marcadorUsuario = L.marker([latInicial, lngInicial]).addTo(map).bindPopup('Você está aqui');
-
-
-        // --- DEFININDO ÍCONES DE CARROS DE CORES DIFERENTES ---
-        
-        // Ícone Vermelho (Econômico)
-        var iconeCarroVermelho = L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/744/744465.png',
-            iconSize: [32, 32], iconAnchor: [16, 16]
+        // BUSCAR LOCALIZAÇÃO REAL
+        map.locate({setView: true, maxZoom: 16});
+        map.on('locationfound', function(e) {
+            mUsuario = L.marker(e.latlng).addTo(map).bindPopup("Você").openPopup();
+            spawnCars(e.latlng); // Cria carros perto de você
         });
 
-        // Ícone Preto (Conforto)
-        var iconeCarroPreto = L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3202/3202926.png',
-            iconSize: [36, 36], iconAnchor: [18, 18]
-        });
-
-        // Ícone Branco (Comum)
-        var iconeCarroBranco = L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/1048/1048314.png',
-            iconSize: [32, 32], iconAnchor: [16, 16]
-        });
-
-
-        // --- ADICIONANDO MOTORISTAS EXATAMENTE NAS RUAS ---
-
-        // Motorista 1: Vermelho na Via S1
-        L.marker([-15.7940, -47.8830], {icon: iconeCarroVermelho}).addTo(map);
-
-        // Motorista 2: Preto na Via N1
-        L.marker([-15.7925, -47.8810], {icon: iconeCarroPreto}).addTo(map);
-
-        // Motorista 3: Branco perto da Rodoviária
-        L.marker([-15.7935, -47.8850], {icon: iconeCarroBranco}).addTo(map);
-
-
-        map.on('click', function(e) {
-            // Remove destino anterior
-            if (marcadorDestino) map.removeLayer(marcadorDestino);
-            if (linhaRota) map.removeLayer(linhaRota);
-            
-            // Ícone de destino
-            var iconeDestino = L.icon({
-                iconUrl: 'https://cdn-icons-png.flaticon.com/512/2776/2776067.png',
-                iconSize: [40, 40],
-                iconAnchor: [20, 40]
-            });
-
-            marcadorDestino = L.marker([e.latlng.lat, e.latlng.lng], {icon: iconeDestino}).addTo(map);
-            map.flyTo([e.latlng.lat, e.latlng.lng], 15);
-
-            // --- DESENHAR A LINHA AZUL DE ROTA ---
-            // Simula uma rota do usuário até o destino
-            var pontosRota = [
-                marcadorUsuario.getLatLng(),
-                marcadorDestino.getLatLng()
-            ];
-            
-            linhaRota = L.polyline(pontosRota, {
-                color: '#1a73e8', // Azul Google
-                weight: 5,
-                opacity: 0.7
-            }).addTo(map);
-        });
-
-        function solicitar() {
-            if(!marcadorDestino) {
-                alert("Por favor, selecione o destino no mapa.");
-            } else {
-                alert("🚗 Motorista aceitou! Ele está no Toyota Corolla branco.");
+        function spawnCars(pos) {
+            var icon = L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/744/744465.png', iconSize: [30,30]});
+            for(i=0; i<3; i++) {
+                L.marker([pos.lat + (Math.random()*0.01 - 0.005), pos.lng + (Math.random()*0.01 - 0.005)], {icon: icon}).addTo(map);
             }
         }
+
+        map.on('click', function(e) {
+            if(mDestino) map.removeLayer(mDestino);
+            if(rota) map.removeLayer(rota);
+
+            mDestino = L.marker(e.latlng).addTo(map);
+            rota = L.polyline([mUsuario.getLatLng(), e.latlng], {color: '#1a73e8', weight: 5}).addTo(map);
+            
+            // CALCULAR DISTÂNCIA
+            var dist = mUsuario.getLatLng().distanceTo(e.latlng) / 1000;
+            km = dist;
+            atualizarPrecos();
+        });
+
+        function selecionar(tipo, valor) {
+            taxa = valor;
+            document.querySelectorAll('.opcao').forEach(el => el.classList.remove('selecionada'));
+            document.getElementById(tipo).classList.add('selecionada');
+            atualizarPrecos();
+        }
+
+        function atualizarPrecos() {
+            document.getElementById('preco-eco').innerText = "R$ " + (km * 2.5 + 5).toFixed(2);
+            document.getElementById('preco-black').innerText = "R$ " + (km * 4.8 + 10).toFixed(2);
+        }
+
+        function chamar() { alert("Motorista a caminho!"); }
     </script>
 </body>
 </html>
