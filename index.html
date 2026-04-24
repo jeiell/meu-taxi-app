@@ -3,165 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Taxi App Final</title>
+    <title>Vapt-Vupt | Seu App de Mobilidade</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root { --amarelo: #FFD700; --preto: #1a1a1a; }
-        
+        :root { --cor-app: #FFD700; --preto: #1a1a1a; --azul: #1a73e8; }
         * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; }
 
-        body, html { 
-            margin: 0; 
-            padding: 0; 
-            height: 100%; 
-            width: 100%;
-            overflow: hidden; /* Impede que a tela balance */
-            display: flex;
-            flex-direction: column;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        /* Identidade Visual no Topo */
+        .header { background: var(--preto); color: var(--cor-app); padding: 10px; text-align: center; font-weight: bold; font-size: 14px; z-index: 1001; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        
+        .search-container { position: absolute; top: 50px; width: 100%; padding: 0 15px; z-index: 1000; }
+        .search-input { width: 100%; padding: 12px 20px; border-radius: 25px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); outline: none; }
 
-        /* Barra de Busca */
-        .search-container {
-            position: absolute;
-            top: 15px;
-            width: 100%;
-            padding: 0 15px;
-            z-index: 1000;
-        }
-        .search-input {
-            width: 100%;
-            padding: 14px 20px;
-            border-radius: 25px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            font-size: 16px;
-            outline: none;
-        }
+        #map { flex: 1; width: 100%; z-index: 1; }
 
-        /* Mapa ocupa todo o espaço flexível */
-        #map { 
-            flex: 1; 
-            width: 100%;
-            z-index: 1;
-        }
+        .bottom-panel { background: white; padding: 15px; border-radius: 20px 20px 0 0; z-index: 10; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); }
+        .ride-option { display: flex; align-items: center; padding: 10px; border: 2px solid #f0f0f0; border-radius: 12px; margin-bottom: 8px; }
+        .ride-option.active { border-color: var(--cor-app); background: #fffdf0; }
+        .ride-info { flex: 1; margin-left: 10px; }
+        .ride-info strong { display: block; font-size: 15px; }
+        .price { font-weight: bold; }
 
-        /* Painel Inferior Ajustado */
-        .bottom-panel {
-            background: white;
-            padding: 20px;
-            border-radius: 25px 25px 0 0;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
-            z-index: 10;
-            width: 100%;
-        }
+        .btn-confirm { width: 100%; background: var(--preto); color: white; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; }
 
-        .ride-option {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border: 2px solid #f0f0f0;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            transition: 0.2s;
-        }
-        .ride-option.active {
-            border-color: var(--amarelo);
-            background: #fffef0;
-        }
-
-        .ride-option img { width: 45px; margin-right: 15px; }
-        .ride-info { flex: 1; }
-        .ride-info strong { display: block; font-size: 16px; }
-        .ride-info span { color: #888; font-size: 13px; }
-        .price { font-weight: bold; font-size: 17px; }
-
-        .btn-confirm {
-            width: 100%;
-            background: var(--preto);
-            color: white;
-            padding: 16px;
-            border-radius: 12px;
-            border: none;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
+        /* Interface de Chat e Avaliação */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; padding: 20px; border-radius: 20px; width: 100%; text-align: center; }
+        .chat-msg { background: #f0f0f0; padding: 10px; border-radius: 10px; margin: 10px 0; text-align: left; font-size: 14px; }
+        .input-chat { width: 80%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
+        .stars { font-size: 30px; color: #ddd; margin: 15px 0; }
+        .stars span { cursor: pointer; }
+        .stars .gold { color: var(--cor-app); }
     </style>
 </head>
 <body>
 
+    <div class="header">⚡ VAPT-VUPT IMPERATRIZ</div>
+
     <div class="search-container">
-        <input type="text" class="search-input" placeholder="Para onde vamos?">
+        <input type="text" class="search-input" placeholder="Qual o seu destino?">
     </div>
 
     <div id="map"></div>
 
     <div class="bottom-panel">
         <div id="opt-eco" class="ride-option active" onclick="selectType('eco', 2.80)">
-            <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png">
-            <div class="ride-info">
-                <strong>Econômico</strong>
-                <span>3 min • Chegada 21:05</span>
-            </div>
+            <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" width="40">
+            <div class="ride-info"><strong>Econômico</strong><span>3 min de você</span></div>
             <div class="price" id="p-eco">R$ 0,00</div>
         </div>
+        <button class="btn-confirm" onclick="iniciarViagem()">Solicitar Agora</button>
+    </div>
 
-        <div id="opt-black" class="ride-option" onclick="selectType('black', 4.50)">
-            <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
-            <div class="ride-info">
-                <strong>Black</strong>
-                <span>6 min • Chegada 21:08</span>
-            </div>
-            <div class="price" id="p-black">R$ 0,00</div>
+    <div id="modalChat" class="modal">
+        <div class="modal-content">
+            <h3>Falar com Motorista</h3>
+            <div class="chat-msg"><strong>Motorista:</strong> Estou chegando em 2 minutos!</div>
+            <div id="minhasMensagens"></div>
+            <input type="text" id="msgInput" class="input-chat" placeholder="Escreva aqui...">
+            <button onclick="enviarMsg()" style="padding: 10px; background: var(--azul); color: white; border: none; border-radius: 10px;">➔</button>
+            <br><br>
+            <button onclick="finalizarCorrida()" style="color: red; border: none; background: none;">Finalizar Corrida</button>
         </div>
+    </div>
 
-        <button class="btn-confirm" onclick="confirm()">Confirmar Viagem</button>
+    <div id="modalAvaliacao" class="modal">
+        <div class="modal-content">
+            <h3>Corrida Finalizada!</h3>
+            <p>Como foi sua experiência com o motorista?</p>
+            <div class="stars">
+                <span onclick="rate(1)">★</span><span onclick="rate(2)">★</span><span onclick="rate(3)">★</span><span onclick="rate(4)">★</span><span onclick="rate(5)">★</span>
+            </div>
+            <button class="btn-confirm" onclick="location.reload()">Enviar e Fechar</button>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 14);
-        var userM, destM, route, km = 0;
-
+        var userM, km = 0;
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         map.locate({setView: true, maxZoom: 16});
-
-        map.on('locationfound', function(e) {
+        map.on('locationfound', e => {
             userM = L.marker(e.latlng).addTo(map).bindPopup("Você").openPopup();
-            // Spawn de carros perto
-            var icon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/744/744465.png', iconSize: [30, 30] });
+            // Spawn carros
             for(let i=0; i<3; i++) {
-                L.marker([e.latlng.lat + (Math.random()*0.006-0.003), e.latlng.lng + (Math.random()*0.006-0.003)], {icon: icon}).addTo(map);
+                let icon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/744/744465.png', iconSize: [30,30] });
+                L.marker([e.latlng.lat+(Math.random()*0.006-0.003), e.latlng.lng+(Math.random()*0.006-0.003)], {icon: icon}).addTo(map);
             }
         });
 
-        map.on('click', function(e) {
-            if (destM) map.removeLayer(destM);
-            if (route) map.removeLayer(route);
-
-            destM = L.marker(e.latlng).addTo(map);
-            route = L.polyline([userM.getLatLng(), e.latlng], {color: '#1a73e8', weight: 5}).addTo(map);
-            
+        map.on('click', e => {
             km = userM.getLatLng().distanceTo(e.latlng) / 1000;
-            updatePrices();
+            document.getElementById('p-eco').innerText = "R$ " + (km * 2.8 + 6).toFixed(2);
+            L.marker(e.latlng).addTo(map);
+            L.polyline([userM.getLatLng(), e.latlng], {color: '#1a73e8'}).addTo(map);
         });
 
-        function selectType(id, rate) {
-            document.querySelectorAll('.ride-option').forEach(el => el.classList.remove('active'));
-            document.getElementById('opt-' + id).classList.add('active');
-            updatePrices();
+        function iniciarViagem() {
+            if(km === 0) return alert("Escolha o destino no mapa!");
+            document.getElementById('modalChat').style.display = 'flex';
         }
 
-        function updatePrices() {
-            document.getElementById('p-eco').innerText = "R$ " + (km * 2.8 + 6).toFixed(2);
-            document.getElementById('p-black').innerText = "R$ " + (km * 4.5 + 10).toFixed(2);
+        function enviarMsg() {
+            let val = document.getElementById('msgInput').value;
+            if(val) {
+                document.getElementById('minhasMensagens').innerHTML += `<div class="chat-msg" style="text-align:right"><strong>Você:</strong> ${val}</div>`;
+                document.getElementById('msgInput').value = '';
+            }
         }
 
-        function confirm() {
-            if(km === 0) alert("Escolha o destino!");
-            else alert("Motorista a caminho!");
+        function finalizarCorrida() {
+            document.getElementById('modalChat').style.display = 'none';
+            document.getElementById('modalAvaliacao').style.display = 'flex';
+        }
+
+        function rate(n) {
+            let stars = document.querySelectorAll('.stars span');
+            stars.forEach((s, i) => s.classList.toggle('gold', i < n));
         }
     </script>
 </body>
