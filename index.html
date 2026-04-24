@@ -2,50 +2,107 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Taxi App Profissional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Taxi App Final</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root { --amarelo: #FFD700; --preto: #1a1a1a; --azul: #1a73e8; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f0f0; height: 100vh; display: flex; flex-direction: column; }
+        :root { --amarelo: #FFD700; --preto: #1a1a1a; }
         
-        /* Mapa ocupa o fundo */
-        #map { flex: 1; width: 100%; z-index: 1; }
+        * { box-sizing: border-box; }
+
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            width: 100%;
+            overflow: hidden; /* Impede que a tela balance */
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
 
         /* Barra de Busca */
-        .search-bar { position: absolute; top: 20px; width: 90%; left: 5%; z-index: 1000; }
-        .search-bar input { width: 100%; padding: 15px; border-radius: 30px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); outline: none; font-size: 16px; }
+        .search-container {
+            position: absolute;
+            top: 15px;
+            width: 100%;
+            padding: 0 15px;
+            z-index: 1000;
+        }
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 16px;
+            outline: none;
+        }
 
-        /* Painel Inferior Estilizado */
-        .bottom-panel { background: white; padding: 20px; border-radius: 25px 25px 0 0; z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); margin-top: -20px; }
-        .label { font-size: 12px; color: #888; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; display: block; }
+        /* Mapa ocupa todo o espaço flexível */
+        #map { 
+            flex: 1; 
+            width: 100%;
+            z-index: 1;
+        }
 
-        .ride-option { display: flex; align-items: center; padding: 12px; border: 2px solid #eee; border-radius: 15px; margin-bottom: 10px; transition: 0.3s; cursor: pointer; }
-        .ride-option.active { border-color: var(--amarelo); background: #fffdf0; }
+        /* Painel Inferior Ajustado */
+        .bottom-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 25px 25px 0 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+            width: 100%;
+        }
+
+        .ride-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: 0.2s;
+        }
+        .ride-option.active {
+            border-color: var(--amarelo);
+            background: #fffef0;
+        }
+
         .ride-option img { width: 45px; margin-right: 15px; }
         .ride-info { flex: 1; }
         .ride-info strong { display: block; font-size: 16px; }
-        .ride-info span { color: #666; font-size: 13px; }
-        .price { font-weight: bold; font-size: 18px; color: var(--preto); }
+        .ride-info span { color: #888; font-size: 13px; }
+        .price { font-weight: bold; font-size: 17px; }
 
-        .confirm-btn { width: 100%; background: var(--preto); color: white; padding: 18px; border-radius: 15px; border: none; font-size: 18px; font-weight: bold; margin-top: 10px; }
-        .confirm-btn:active { transform: scale(0.98); }
+        .btn-confirm {
+            width: 100%;
+            background: var(--preto);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="search-bar"><input type="text" placeholder="Para onde vamos?"></div>
-    
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Para onde vamos?">
+    </div>
+
     <div id="map"></div>
 
     <div class="bottom-panel">
-        <span class="label">Sugestões de Viagem</span>
-        
         <div id="opt-eco" class="ride-option active" onclick="selectType('eco', 2.80)">
             <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png">
             <div class="ride-info">
                 <strong>Econômico</strong>
-                <span>4 min • Chegada 20:45</span>
+                <span>3 min • Chegada 21:05</span>
             </div>
             <div class="price" id="p-eco">R$ 0,00</div>
         </div>
@@ -53,74 +110,58 @@
         <div id="opt-black" class="ride-option" onclick="selectType('black', 4.50)">
             <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
             <div class="ride-info">
-                <strong>Black Executivo</strong>
-                <span>7 min • Chegada 20:48</span>
+                <strong>Black</strong>
+                <span>6 min • Chegada 21:08</span>
             </div>
             <div class="price" id="p-black">R$ 0,00</div>
         </div>
 
-        <button class="confirm-btn" onclick="confirmRide()">Confirmar Solicitação</button>
+        <button class="btn-confirm" onclick="confirm()">Confirmar Viagem</button>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 13);
-        var userMarker, destMarker, routeLine, currentKm = 0;
+        var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 14);
+        var userM, destM, route, km = 0;
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Localizar usuário de verdade
         map.locate({setView: true, maxZoom: 16});
 
         map.on('locationfound', function(e) {
-            if (userMarker) map.removeLayer(userMarker);
-            userMarker = L.circleMarker(e.latlng, { radius: 8, color: 'white', fillColor: '#1a73e8', fillOpacity: 1, weight: 3 }).addTo(map);
-            spawnNearbyCars(e.latlng);
+            userM = L.marker(e.latlng).addTo(map).bindPopup("Você").openPopup();
+            // Spawn de carros perto
+            var icon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/744/744465.png', iconSize: [30, 30] });
+            for(let i=0; i<3; i++) {
+                L.marker([e.latlng.lat + (Math.random()*0.006-0.003), e.latlng.lng + (Math.random()*0.006-0.003)], {icon: icon}).addTo(map);
+            }
         });
 
-        // Gerar carrinhos aleatórios nas ruas próximas
-        function spawnNearbyCars(pos) {
-            var carIcon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/744/744465.png', iconSize: [30, 30] });
-            for(let i=0; i<4; i++) {
-                let lat = pos.lat + (Math.random() * 0.006 - 0.003);
-                let lng = pos.lng + (Math.random() * 0.006 - 0.003);
-                L.marker([lat, lng], { icon: carIcon }).addTo(map);
-            }
-        }
-
-        // Clique no destino
         map.on('click', function(e) {
-            if (destMarker) map.removeLayer(destMarker);
-            if (routeLine) map.removeLayer(routeLine);
+            if (destM) map.removeLayer(destM);
+            if (route) map.removeLayer(route);
 
-            destMarker = L.marker(e.latlng).addTo(map);
+            destM = L.marker(e.latlng).addTo(map);
+            route = L.polyline([userM.getLatLng(), e.latlng], {color: '#1a73e8', weight: 5}).addTo(map);
             
-            // Desenha a linha azul (Rota)
-            routeLine = L.polyline([userMarker.getLatLng(), e.latlng], { color: '#1a73e8', weight: 6, opacity: 0.6 }).addTo(map);
-            
-            // Calcula distância
-            currentKm = userMarker.getLatLng().distanceTo(e.latlng) / 1000;
-            updateUI();
+            km = userM.getLatLng().distanceTo(e.latlng) / 1000;
+            updatePrices();
         });
 
         function selectType(id, rate) {
             document.querySelectorAll('.ride-option').forEach(el => el.classList.remove('active'));
             document.getElementById('opt-' + id).classList.add('active');
-            updateUI();
+            updatePrices();
         }
 
-        function updateUI() {
-            // Preço base R$ 5,00 + valor por KM
-            let pEco = (currentKm * 2.80) + 5.00;
-            let pBlack = (currentKm * 4.50) + 8.00;
-            
-            document.getElementById('p-eco').innerText = "R$ " + pEco.toFixed(2);
-            document.getElementById('p-black').innerText = "R$ " + pBlack.toFixed(2);
+        function updatePrices() {
+            document.getElementById('p-eco').innerText = "R$ " + (km * 2.8 + 6).toFixed(2);
+            document.getElementById('p-black').innerText = "R$ " + (km * 4.5 + 10).toFixed(2);
         }
 
-        function confirmRide() {
-            if (currentKm === 0) alert("Por favor, selecione um destino no mapa!");
-            else alert("🚗 Motorista a caminho! Placa: ABC-1234");
+        function confirm() {
+            if(km === 0) alert("Escolha o destino!");
+            else alert("Motorista a caminho!");
         }
     </script>
 </body>
