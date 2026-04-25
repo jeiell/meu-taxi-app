@@ -21,7 +21,7 @@
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
-        /* TELA DE BOAS-VINDAS (SPLASH SCREEN) */
+        /* TELA DE BOAS-VINDAS COM CARRINHO PASSANDO */
         #splash {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -32,13 +32,35 @@
             align-items: center;
             z-index: 5000;
             transition: opacity 0.8s ease;
+            overflow: hidden;
         }
-        #splash h2 { color: var(--topo-texto); font-size: 28px; letter-spacing: 4px; margin: 0; text-align: center; }
-        #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.9; }
-        .loader { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: var(--topo-texto); animation: spin 1s linear infinite; margin-top: 30px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        #splash h2 { color: var(--topo-texto); font-size: 28px; letter-spacing: 4px; margin: 0; text-align: center; font-weight: bold; }
+        #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.8; }
 
-        /* Interface Principal */
+        /* Animação do Carrinho */
+        .road {
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            margin-top: 40px;
+            position: relative;
+        }
+        .car-anim {
+            position: absolute;
+            top: -25px;
+            left: -50px;
+            width: 40px;
+            filter: brightness(0) invert(1); /* Deixa o ícone branco */
+            animation: drive 2s linear infinite;
+        }
+        @keyframes drive {
+            0% { left: -50px; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+
+        /* Interface Principal (Mantida) */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
@@ -60,7 +82,7 @@
 
         .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; }
 
-        /* ASSINATURA NATANAEL */
+        /* ASSINATURA NATANAEL REFORÇADA */
         .footer-powered { text-align: center; font-size: 11px; color: #444; padding-top: 12px; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
         .footer-powered span { color: var(--primaria); }
 
@@ -69,7 +91,7 @@
         .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 25px; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
-        .chat-area { max-height: 150px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .chat-area { height: 150px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
         .msg { padding: 8px 12px; border-radius: 10px; font-size: 13px; max-width: 85%; }
         .msg.bot { background: #eee; align-self: flex-start; }
         .msg.me { background: #dcf8c6; align-self: flex-end; }
@@ -79,8 +101,10 @@
 
     <div id="splash">
         <h2>MOBILIZE CAR</h2>
-        <p>Bem-vinda à sua melhor viagem</p>
-        <div class="loader"></div>
+        <p>Segurança e Conforto para Mulheres</p>
+        <div class="road">
+            <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" class="car-anim">
+        </div>
     </div>
 
     <div class="header">
@@ -121,32 +145,32 @@
 
     <div id="modalChat" class="modal-overlay" onclick="fecharModal(event, 'modalChat')">
         <div class="modal-window">
-            <h3 style="color:var(--primaria)">Suporte</h3>
-            <div class="chat-area" id="chatMsg"><div class="msg bot">Olá! Como podemos ajudar?</div></div>
+            <h3 style="color:var(--primaria)">Suporte Mobilize</h3>
+            <div class="chat-area" id="chatMsg"><div class="msg bot">Olá! Como podemos ajudar hoje?</div></div>
             <div style="display:flex; gap:5px">
-                <input type="text" id="chatInput" placeholder="Mensagem..." style="flex:1; padding:10px; border-radius:20px; border:1px solid #ddd;">
-                <button onclick="enviarMensagem()" style="background:var(--primaria); color:white; border:none; border-radius:50%; width:40px;">➔</button>
+                <input type="text" id="chatInput" placeholder="Mensagem..." style="flex:1; padding:10px; border-radius:20px; border:1px solid #ddd; outline:none;">
+                <button onclick="enviarMensagem()" style="background:var(--primaria); color:white; border:none; border-radius:50%; width:40px; height:40px;">➔</button>
             </div>
         </div>
     </div>
 
     <div id="modalAvaliar" class="modal-overlay" onclick="fecharModal(event, 'modalAvaliar')">
         <div class="modal-window" style="text-align: center;">
-            <h3>Avaliar Viagem</h3>
+            <h3>Avaliar Experiência</h3>
             <div style="font-size:35px; color:#D4AF37; margin:15px">★★★★★</div>
-            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar</button>
+            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // LÓGICA DA TELA DE BOAS VINDAS
+        // LÓGICA DA SPLASH SCREEN
         window.onload = () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash');
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.display = 'none', 800);
-            }, 3000); // 3 segundos de exibição
+            }, 3000); 
         };
 
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 16);
@@ -176,16 +200,19 @@
 
         function enviarMensagem() {
             let inp = document.getElementById('chatInput');
+            let area = document.getElementById('chatMsg');
             if(inp.value) {
-                document.getElementById('chatMsg').innerHTML += `<div class="msg me">${inp.value}</div>`;
+                area.innerHTML += `<div class="msg me">${inp.value}</div>`;
                 inp.value = '';
+                area.scrollTop = area.scrollHeight;
             }
         }
 
         function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
         function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        
         function confirmarViagem() {
-            if(km === 0) alert("Informe o destino!");
+            if(km === 0) alert("Por favor, informe seu destino!");
             else alert("✅ Motorista Maria Oliveira está a caminho!");
         }
     </script>
