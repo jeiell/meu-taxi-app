@@ -21,7 +21,7 @@
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
-        /* SPLASH SCREEN COM ANIMAÇÃO SINCRONIZADA */
+        /* TELA DE BOAS-VINDAS (SPLASH) */
         #splash {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -36,6 +36,7 @@
         #splash h2 { color: var(--topo-texto); font-size: 28px; letter-spacing: 4px; margin: 0; font-weight: bold; }
         #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.8; }
 
+        /* A BARRA E O CARRO */
         .progress-container {
             width: 280px;
             height: 35px;
@@ -47,38 +48,37 @@
             overflow: hidden;
         }
 
-        /* Barra de Progresso (Branca) */
         .progress-bar {
             position: absolute;
             height: 100%;
             width: 0%;
             background: white;
+            /* Linear para manter a mesma velocidade do carro */
             animation: fillBar 3.5s linear forwards;
         }
 
-        /* Carrinho (Sempre à frente) */
         .car-loader {
             position: absolute;
             top: 50%;
             transform: translateY(-50%) scaleX(-1); 
             width: 35px;
-            left: -45px;
+            left: -40px;
             filter: brightness(0) invert(1);
             animation: driveCar 3.5s linear forwards;
         }
 
-        /* Animação que garante o "vazio" entre carro e barra */
+        /* SINCRONIZAÇÃO: Carro na frente, Barra seguindo */
         @keyframes fillBar {
             0% { width: 0%; }
-            80% { width: 70%; }  /* Mantém distância do carro */
+            75% { width: 65%; } /* Barra mantém 10% de distância */
             90% { width: 85%; }
-            100% { width: 100%; } /* Só enche tudo quando o carro sai */
+            100% { width: 100%; } /* Só fecha 100% quando o carro já sumiu */
         }
 
         @keyframes driveCar {
-            0% { left: -45px; }
-            80% { left: 75%; }   /* Carro puxa a barra com folga */
-            100% { left: 120%; }  /* Carro sai da tela no final */
+            0% { left: -40px; }
+            75% { left: 75%; }  /* Carro sempre à frente */
+            100% { left: 120%; } /* Carro acelera para fora */
         }
 
         /* Interface Principal */
@@ -161,7 +161,7 @@
         <button class="btn-confirm" onclick="confirmarViagem()">Confirmar Mobilize</button>
         
         <div class="footer-powered">
-            ⚡ POWERED BY <span>NATANAEL TEIXEIRA</span>
+            POWERED BY NATANAEL TEIXEIRA
         </div>
     </div>
 
@@ -192,13 +192,12 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Splash logic
         window.onload = () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash');
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.display = 'none', 800);
-            }, 4200); 
+            }, 4500); 
         };
 
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 16);
