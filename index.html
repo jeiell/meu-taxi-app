@@ -7,202 +7,80 @@
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a148c">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#4a148c">
     <link rel="apple-touch-icon" href="icon-1024.png">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        :root {
-            --roxo-imperial: #4a148c;
-            --dourado-premium: #D4AF37;
-            --rosa-foco: #c71585;
+        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background: #4a148c; }
+        #map { width: 100%; height: 100vh; z-index: 1; }
+        
+        .header {
+            position: absolute; top: 0; width: 100%; background: #4a148c;
+            color: #D4AF37; text-align: center; padding: 10px 0; z-index: 1000;
+        }
+        
+        .search-bar {
+            position: absolute; top: 70px; left: 5%; width: 90%;
+            background: white; border-radius: 25px; padding: 12px;
+            z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            background-color: var(--roxo-imperial);
-        }
-
-        /* Header Luxo */
-        header {
-            background: linear-gradient(135deg, var(--roxo-imperial) 0%, #2a0a52 100%);
-            color: var(--dourado-premium);
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            position: absolute;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        header h1 { margin: 0; font-size: 20px; letter-spacing: 2px; }
-        header p { margin: 0; font-size: 10px; color: #fff; opacity: 0.8; }
-
-        /* Mapa */
-        #map {
-            width: 100%;
-            height: 100vh;
-            z-index: 1;
-        }
-
-        /* Barra de Busca Superior */
-        .search-container {
-            position: absolute;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 90%;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 15px;
-            border-radius: 30px;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            font-size: 16px;
-            outline: none;
-        }
-
-        /* Botão SOS Flutuante */
         .sos-btn {
-            position: absolute;
-            bottom: 180px;
-            right: 20px;
-            background-color: red;
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(255,0,0,0.5);
-            z-index: 1000;
-            border: 3px solid white;
-            cursor: pointer;
-            animation: pulse 2s infinite;
+            position: absolute; bottom: 180px; right: 20px;
+            background: red; color: white; width: 60px; height: 60px;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; z-index: 1000;
+            border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .panel {
+            position: absolute; bottom: 0; width: 100%;
+            background: white; border-radius: 20px 20px 0 0;
+            padding: 20px; box-sizing: border-box; z-index: 1000;
         }
 
-        /* Painel Inferior de Corrida */
-        .ride-panel {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: white;
-            border-radius: 25px 25px 0 0;
-            padding: 20px;
-            box-sizing: border-box;
-            z-index: 1000;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        .options { display: flex; gap: 10px; margin-bottom: 15px; }
+        .opt { 
+            flex: 1; border: 2px solid #ddd; border-radius: 10px; 
+            padding: 10px; text-align: center; font-size: 14px;
         }
-
-        .ride-options {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 15px;
-        }
-
-        .option {
-            text-align: center;
-            padding: 10px;
-            border: 2px solid #eee;
-            border-radius: 15px;
-            width: 45%;
-        }
-
-        .option.active {
-            border-color: var(--roxo-imperial);
-            background: #f4f0fa;
-        }
+        .active { border-color: #4a148c; background: #f4f0fa; }
 
         .btn-confirm {
-            background-color: var(--roxo-imperial);
-            color: white;
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Rodapé de Créditos */
-        .footer-credits {
-            text-align: center;
-            font-size: 9px;
-            color: #777;
-            margin-top: 10px;
-            text-transform: uppercase;
+            background: #4a148c; color: white; width: 100%;
+            padding: 15px; border: none; border-radius: 10px;
+            font-size: 18px; font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>MOBILIZE CAR</h1>
-        <p>SEGURANÇA E CONFORTO PARA MULHERES</p>
-    </header>
-
-    <div class="search-container">
-        <input type="text" class="search-input" placeholder="Aonde vamos hoje?">
+    <div class="header">
+        <strong>MOBILIZE CAR</strong><br>
+        <small style="font-size: 10px; color: white;">SEGURANÇA PARA MULHERES</small>
     </div>
+
+    <div class="search-bar">Aonde vamos hoje?</div>
 
     <div id="map"></div>
 
-    <div class="sos-btn" onclick="alert('Alerta SOS enviado para a central e contatos de segurança!')">SOS</div>
+    <div class="sos-btn">SOS</div>
 
-    <div class="ride-panel">
-        <div class="ride-options">
-            <div class="option active">
-                <strong>Econômico</strong><br>
-                <small>R$ 0,00</small>
-            </div>
-            <div class="option">
-                <strong>Premium</strong><br>
-                <small>R$ 0,00</small>
-            </div>
+    <div class="panel">
+        <div class="options">
+            <div class="opt active"><b>Econômico</b><br>R$ 0,00</div>
+            <div class="opt"><b>Premium</b><br>R$ 0,00</div>
         </div>
         <button class="btn-confirm">Confirmar Mobilize</button>
-        <div class="footer-credits">⚡ Powered by Natanael Teixeira</div>
+        <p style="text-align:center; font-size: 10px; color: #999; margin-top: 10px;">POWERED BY NATANAEL TEIXEIRA</p>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inicializa o mapa focado na região (ajustado para Imperatriz/Balsas)
-        const map = L.map('map').setView([-5.52627, -47.4764], 13);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        // Marcador simulando o usuário
-        L.marker([-5.52627, -47.4764]).addTo(map)
-            .bindPopup('Você está aqui')
-            .openPopup();
-
-        // Registro do Service Worker para PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => {
-                console.log("Service Worker Ativo!");
-            });
-        }
+        const map = L.map('map', { zoomControl: false }).setView([-5.526, -47.476], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.marker([-5.526, -47.476]).addTo(map).bindPopup('Você está aqui').openPopup();
     </script>
 </body>
 </html>
