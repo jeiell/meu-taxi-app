@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4a148c">
+    
     <title>Mobilize Car | Oficial</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
@@ -14,59 +19,87 @@
             --sos: #ff0000;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; background: var(--fundo-app); }
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
-        /* SPLASH SCREEN (A PERFEITA) */
+        /* SPLASH SCREEN (A BARRA E O CARRO PERFEITOS) */
         #splash {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; transition: opacity 0.8s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
         }
         #splash h2 { color: var(--topo-texto); font-size: 28px; letter-spacing: 4px; margin: 0; font-weight: bold; }
-        #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.9; } /* Sua leitura protegida da PRF! */
+        #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.9; }
 
         .loading-zone { width: 280px; margin-top: 40px; position: relative; }
-        .bar-track { width: 100%; height: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden; background: rgba(255,255,255,0.05); margin-bottom: 8px; }
+        
+        .bar-track {
+            width: 100%; height: 8px; 
+            border: 1px solid rgba(255,255,255,0.3); border-radius: 4px;
+            overflow: hidden; background: rgba(255,255,255,0.05); margin-bottom: 8px;
+        }
         .progress-bar { height: 100%; width: 0%; background: white; animation: fillBar 3.5s linear forwards; }
+
         .car-track { width: 100%; height: 30px; position: relative; }
-        .car-loader { position: absolute; width: 38px; filter: brightness(0) invert(1); transform: scaleX(-1); left: -50px; animation: driveCar 3.5s linear forwards; }
+        .car-loader {
+            position: absolute; width: 38px; filter: brightness(0) invert(1);
+            transform: scaleX(-1); left: -50px; animation: driveCar 3.5s linear forwards;
+        }
 
         @keyframes fillBar { 0% { width: 0%; } 85% { width: 85%; } 100% { width: 100%; } }
         @keyframes driveCar { 0% { left: -50px; } 85% { left: 85%; } 100% { left: 120%; } }
 
-        /* UI PRINCIPAL */
-        .header { background: var(--topo-fundo); color: white; padding: 12px; text-align: center; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .header h1 { margin: 0; font-size: 20px; color: var(--topo-texto); letter-spacing: 2px; }
-        
+        /* INTERFACE PRINCIPAL RESTAURADA */
+        .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 100; }
+        .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
+        .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
+
+        .search-box { position: absolute; top: 65px; width: 90%; left: 5%; z-index: 1000; display: flex; }
+        .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); outline: none; }
+        .search-box button { background: var(--primaria); color: white; border: none; border-radius: 0 20px 20px 0; width: 45px; cursor: pointer; }
+
         #map { flex: 1; width: 100%; z-index: 1; }
 
-        .search-box { position: absolute; top: 75px; width: 90%; left: 5%; z-index: 1000; display: flex; }
-        .search-box input { flex: 1; padding: 14px; border-radius: 25px 0 0 25px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); outline: none; }
-        .search-box button { background: var(--primaria); color: white; border: none; border-radius: 0 25px 25px 0; width: 55px; cursor: pointer; }
-
-        /* BOTÃO SOS FLUTUANTE */
+        /* BOTÃO SOS (NOVO ACESSÓRIO DE SEGURANÇA) */
         .btn-sos {
-            position: absolute; right: 20px; bottom: 320px; width: 50px; height: 50px;
+            position: absolute; right: 15px; bottom: 310px; width: 45px; height: 45px;
             background: var(--sos); color: white; border-radius: 50%; display: flex;
-            justify-content: center; align-items: center; font-weight: bold; font-size: 14px;
+            justify-content: center; align-items: center; font-weight: bold; font-size: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 999; border: 2px solid white;
         }
 
-        /* PAINEL INFERIOR */
         .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
-        
-        .payment-methods { display: flex; justify-content: space-around; margin: 15px 0; background: #f9f9f9; padding: 10px; border-radius: 15px; }
-        .pay-opt { font-size: 12px; color: #666; display: flex; flex-direction: column; align-items: center; opacity: 0.5; cursor: pointer; }
-        .pay-opt.active { color: var(--primaria); opacity: 1; font-weight: bold; }
-        .pay-opt i { font-size: 20px; margin-bottom: 4px; }
+        .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
+        .card { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 5px; border: 2px solid #f0f0f0; border-radius: 15px; }
+        .card.active { border-color: var(--primaria); background: #fffcfd; }
+        .card img { width: 40px; margin-bottom: 5px; }
 
-        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 18px; border-radius: 15px; border: none; font-size: 18px; font-weight: bold; }
+        .interaction-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+        .inter-btn { flex: 1; padding: 12px; background: #f5f5f5; border-radius: 12px; border: none; font-weight: bold; font-size: 13px; color: #555; }
 
-        /* MODAL */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-window { background: white; width: 100%; max-width: 300px; border-radius: 20px; padding: 20px; text-align: center; }
+        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; }
+
+        .footer-powered { text-align: center; font-size: 10px; color: #444; padding-top: 10px; letter-spacing: 1px; font-weight: bold; }
+        .footer-powered span { color: var(--primaria); }
+
+        /* MODAIS RESTAURADOS */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end; }
+        .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 25px; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .chat-area { height: 120px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .msg { padding: 8px; border-radius: 10px; font-size: 13px; max-width: 80%; }
+        .msg.bot { background: #eee; align-self: flex-start; }
+        .msg.me { background: #dcf8c6; align-self: flex-end; }
+
+        /* MODAL SOS ESPECÍFICO */
+        .modal-sos-alert { align-items: center; justify-content: center; padding: 20px; }
+        .modal-sos-alert .modal-window { border-radius: 20px; max-width: 300px; text-align: center; margin-bottom: auto; margin-top: auto; }
     </style>
 </head>
 <body>
@@ -82,43 +115,66 @@
 
     <div class="header">
         <h1>MOBILIZE CAR</h1>
+        <p>Segurança e Conforto para Mulheres</p>
     </div>
 
     <div class="search-box">
-        <input type="text" id="destInput" placeholder="Para onde vamos agora?">
+        <input type="text" id="destInput" placeholder="Aonde vamos hoje?">
         <button onclick="buscarDestino()">🔍</button>
     </div>
 
     <div id="map"></div>
 
-    <div class="btn-sos" onclick="acionarSOS()">SOS</div>
+    <div class="btn-sos" onclick="toggleModal('modalSOS')">SOS</div>
 
     <div class="bottom-panel">
-        <div style="display: flex; gap: 10px;">
-            <div id="card-eco" class="pay-opt active" onclick="selectType('eco')" style="flex:1; border: 1px solid #eee; padding: 10px; border-radius: 10px;">
-                <strong>Econômico</strong><br><span id="p-eco">R$ 0,00</span>
+        <div class="car-options">
+            <div id="card-eco" class="card active" onclick="selectType('eco')">
+                <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png">
+                <div style="font-size:11px"><strong>Econômico</strong> <br> <span id="p-eco">R$ 0,00</span></div>
             </div>
-            <div id="card-black" class="pay-opt" onclick="selectType('black')" style="flex:1; border: 1px solid #eee; padding: 10px; border-radius: 10px;">
-                <strong>Premium</strong><br><span id="p-black">R$ 0,00</span>
+            <div id="card-black" class="card" onclick="selectType('black')">
+                <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
+                <div style="font-size:11px"><strong>Premium</strong> <br> <span id="p-black">R$ 0,00</span></div>
             </div>
         </div>
 
-        <p style="font-size: 12px; color: #888; margin-bottom: 5px; margin-top: 15px;">Forma de Pagamento:</p>
-        <div class="payment-methods">
-            <div class="pay-opt active" id="pay-pix" onclick="setPay('pix')"><span>📱 PIX</span></div>
-            <div class="pay-opt" id="pay-card" onclick="setPay('card')"><span>💳 Cartão</span></div>
-            <div class="pay-opt" id="pay-cash" onclick="setPay('cash')"><span>💵 Dinheiro</span></div>
+        <div class="interaction-bar">
+            <button class="inter-btn" onclick="toggleModal('modalChat')">💬 Chat</button>
+            <button class="inter-btn" onclick="toggleModal('modalAvaliar')">⭐ Avaliar</button>
         </div>
 
-        <button class="btn-confirm" onclick="confirmarViagem()">Chamar Mobilize</button>
-        <p style="text-align: center; font-size: 10px; margin-top: 10px;">POWERED BY <b>NATANAEL TEIXEIRA</b></p>
+        <button class="btn-confirm" onclick="confirmarViagem()">Confirmar Mobilize</button>
+        
+        <div class="footer-powered">
+            ⚡ POWERED BY <span>NATANAEL TEIXEIRA</span>
+        </div>
     </div>
 
-    <div id="modalSOS" class="modal-overlay">
+    <div id="modalChat" class="modal-overlay" onclick="fecharModal(event, 'modalChat')">
+        <div class="modal-window">
+            <h3 style="color:var(--primaria); margin-top:0;">Suporte</h3>
+            <div class="chat-area" id="chatMsg"><div class="msg bot">Olá! Como podemos ajudar?</div></div>
+            <div style="display:flex; gap:5px">
+                <input type="text" id="chatInput" placeholder="Sua mensagem..." style="flex:1; padding:10px; border-radius:20px; border:1px solid #ddd;">
+                <button onclick="enviarMensagem()" style="background:var(--primaria); color:white; border:none; border-radius:50%; width:40px;">➔</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalSOS" class="modal-overlay modal-sos-alert" onclick="fecharModal(event, 'modalSOS')">
         <div class="modal-window">
             <h2 style="color:red">ALERTA SOS</h2>
-            <p>Sua localização foi enviada para a central e contatos de emergência.</p>
-            <button onclick="document.getElementById('modalSOS').style.display='none'" style="padding:10px 20px; border-radius:10px; border:none; background:#eee;">Cancelar</button>
+            <p>Sua localização e dados foram enviados para a nossa central de segurança.</p>
+            <button class="btn-confirm" onclick="document.getElementById('modalSOS').style.display='none'">Ok, entendi</button>
+        </div>
+    </div>
+
+    <div id="modalAvaliar" class="modal-overlay" onclick="fecharModal(event, 'modalAvaliar')">
+        <div class="modal-window" style="text-align: center;">
+            <h3>Avaliar Viagem</h3>
+            <div style="font-size:30px; color:#D4AF37; margin-bottom:20px;">★★★★★</div>
+            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar</button>
         </div>
     </div>
 
@@ -126,37 +182,53 @@
     <script>
         window.onload = () => {
             setTimeout(() => {
-                document.getElementById('splash').style.opacity = '0';
-                setTimeout(() => document.getElementById('splash').style.display = 'none', 800);
+                const splash = document.getElementById('splash');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 800);
             }, 4000); 
         };
 
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
-        var userMarker = L.circleMarker([-5.52, -47.47], {radius: 8, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 3}).addTo(map);
-
-        function setPay(id) {
-            document.querySelectorAll('.payment-methods .pay-opt').forEach(el => el.classList.remove('active'));
-            document.getElementById('pay-' + id).classList.add('active');
-        }
-
-        function acionarSOS() {
-            document.getElementById('modalSOS').style.display = 'flex';
-            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-        }
+        var userMarker;
+        map.locate({setView: true, maxZoom: 16});
+        map.on('locationfound', e => {
+            userMarker = L.circleMarker(e.latlng, {radius: 7, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 2}).addTo(map);
+        });
 
         async function buscarDestino() {
-            let val = document.getElementById('destInput').value;
-            if(!val) return;
-            // Simulação de preço baseada na busca
-            document.getElementById('p-eco').innerText = "R$ " + (Math.random() * 20 + 10).toFixed(2);
-            document.getElementById('p-black').innerText = "R$ " + (Math.random() * 30 + 20).toFixed(2);
+            let input = document.getElementById('destInput').value;
+            if(!input) return;
+            let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}, Imperatriz`);
+            let data = await res.json();
+            if(data.length > 0) {
+                let dest = [data[0].lat, data[0].lon];
+                L.marker(dest).addTo(map);
+                map.flyTo(dest, 16);
+                let dist = userMarker.getLatLng().distanceTo(dest) / 1000;
+                document.getElementById('p-eco').innerText = "R$ " + (dist * 2.5 + 5).toFixed(2);
+                document.getElementById('p-black').innerText = "R$ " + (dist * 4 + 9).toFixed(2);
+            }
         }
 
-        function confirmarViagem() {
-            alert("🚀 Mobilize Car a caminho!\nMotorista: Maria Oliveira\nPlaca: MOB-2026");
+        function selectType(id) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.getElementById('card-' + id).classList.add('active');
         }
+
+        function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        
+        function enviarMensagem() {
+            let inp = document.getElementById('chatInput');
+            if(inp.value) {
+                document.getElementById('chatMsg').innerHTML += `<div class="msg me">${inp.value}</div>`;
+                inp.value = '';
+            }
+        }
+
+        function confirmarViagem() { alert("✅ Viagem Confirmada!\nMotorista Maria Oliveira a caminho."); }
     </script>
 </body>
 </html>
