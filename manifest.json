@@ -1,18 +1,16 @@
 {
   "name": "Mobilize Car Oficial",
   "short_name": "Mobilize",
-  "description": "Aplicativo de Mobilidade Urbana",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#4a148c",
   "theme_color": "#4a148c",
   "icons": [
     {
-      "src": "icon-preenchido.png",
+      "src": "icon-circular.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ]
 }
-
