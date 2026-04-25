@@ -21,7 +21,7 @@
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
-        /* SPLASH SCREEN COM DISTANCIAMENTO CORRIGIDO */
+        /* SPLASH SCREEN - NOVA LÓGICA DE PISTAS */
         #splash {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -34,88 +34,83 @@
             transition: opacity 0.8s ease;
         }
         #splash h2 { color: var(--topo-texto); font-size: 28px; letter-spacing: 4px; margin: 0; font-weight: bold; }
-        #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.8; }
-
-        .progress-container {
+        
+        /* Container da Animação */
+        .loading-zone {
             width: 280px;
-            height: 35px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 8px;
-            position: relative;
             margin-top: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            overflow: hidden;
+            position: relative;
         }
 
-        /* Barra de Progresso - Agora ela corre "atrás" */
+        /* Pista 1: A Barra (Em cima) */
+        .bar-track {
+            width: 100%;
+            height: 10px; /* Barra mais fininha e elegante */
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 10px; /* Margem mínima entre barra e carro */
+        }
         .progress-bar {
-            position: absolute;
             height: 100%;
             width: 0%;
             background: white;
-            /* Velocidade linear total */
             animation: fillBar 3.5s linear forwards;
         }
 
-        /* Carrinho - Ele puxa a fila */
+        /* Pista 2: O Carro (Embaixo) */
+        .car-track {
+            width: 100%;
+            height: 30px;
+            position: relative;
+        }
         .car-loader {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%) scaleX(-1); 
-            width: 38px;
-            left: -50px;
+            width: 40px;
             filter: brightness(0) invert(1);
+            transform: scaleX(-1); /* Frente para direita */
+            left: -50px;
             animation: driveCar 3.5s linear forwards;
         }
 
-        /* AJUSTE DA FÍSICA: O segredo está nos porcentagens */
+        /* Animações Sincronizadas */
         @keyframes fillBar {
             0% { width: 0%; }
-            80% { width: 68%; }  /* Aos 80% do tempo, a barra está em 68% (deixando espaço pro carro) */
-            100% { width: 100%; } /* Só completa quando o carro já "vazou" */
+            85% { width: 85%; }
+            100% { width: 100%; }
         }
 
         @keyframes driveCar {
             0% { left: -50px; }
-            80% { left: 75%; }   /* O carro está sempre uns 7% à frente da ponta da barra */
-            100% { left: 120%; }  /* Carro sai da tela */
+            85% { left: 85%; } /* O carro corre exatamente na frente do fim da barra */
+            100% { left: 120%; } /* Carro sai da tela */
         }
 
-        /* Interface Principal */
+        /* Interface Principal (Mantida) */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
-
         .search-box { position: absolute; top: 60px; width: 90%; left: 5%; z-index: 1000; display: flex; }
         .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); outline: none; }
         .search-box button { background: var(--primaria); color: white; border: none; border-radius: 0 20px 20px 0; width: 45px; cursor: pointer; }
-
         #map { flex: 1; width: 100%; z-index: 1; }
-
         .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.08); }
+        .footer-powered { text-align: center; font-size: 11px; color: #444; padding-top: 12px; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
+        .footer-powered span { color: var(--primaria); }
+
+        /* Cards e Interaction (Mantidos) */
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
         .card { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 5px; border: 2px solid #f0f0f0; border-radius: 15px; text-align: center; }
         .card.active { border-color: var(--primaria); background: #fffcfd; }
         .card img { width: 42px; margin-bottom: 8px; }
-        .card-data { display: flex; justify-content: center; gap: 5px; width: 100%; border-top: 1px solid #f9f9f9; padding-top: 6px; font-size: 12px; }
-
         .interaction-bar { display: flex; gap: 10px; margin-bottom: 15px; }
         .inter-btn { flex: 1; padding: 12px; background: #f5f5f5; border-radius: 12px; color: #555; font-size: 13px; font-weight: bold; border: none; }
-
         .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; }
-
-        .footer-powered { text-align: center; font-size: 11px; color: #444; padding-top: 12px; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
-        .footer-powered span { color: var(--primaria); }
 
         /* Modais */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; align-items: flex-end; }
         .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 25px; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .chat-area { height: 150px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 8px 12px; border-radius: 10px; font-size: 13px; max-width: 85%; }
-        .msg.bot { background: #eee; align-self: flex-start; }
-        .msg.me { background: #dcf8c6; align-self: flex-end; }
     </style>
 </head>
 <body>
@@ -123,9 +118,13 @@
     <div id="splash">
         <h2>MOBILIZE CAR</h2>
         <p>Sua viagem segura começa aqui</p>
-        <div class="progress-container">
-            <div class="progress-bar"></div>
-            <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" class="car-loader">
+        <div class="loading-zone">
+            <div class="bar-track">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="car-track">
+                <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" class="car-loader">
+            </div>
         </div>
     </div>
 
@@ -145,11 +144,11 @@
         <div class="car-options">
             <div id="card-eco" class="card active" onclick="selectType('eco')">
                 <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png">
-                <div class="card-data"><strong>Econômico</strong> <span id="p-eco">R$ 0,00</span></div>
+                <div style="font-size:12px"><strong>Econômico</strong> <span id="p-eco">R$ 0,00</span></div>
             </div>
             <div id="card-black" class="card" onclick="selectType('black')">
                 <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
-                <div class="card-data"><strong>Premium</strong> <span id="p-black">R$ 0,00</span></div>
+                <div style="font-size:12px"><strong>Premium</strong> <span id="p-black">R$ 0,00</span></div>
             </div>
         </div>
 
@@ -165,31 +164,6 @@
         </div>
     </div>
 
-    <div id="modalChat" class="modal-overlay" onclick="fecharModal(event, 'modalChat')">
-        <div class="modal-window">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0; color:var(--primaria)">Suporte</h3>
-                <span style="cursor:pointer; font-size:24px;" onclick="document.getElementById('modalChat').style.display='none'">&times;</span>
-            </div>
-            <div class="chat-area" id="chatMsg"><div class="msg bot">Olá! Como podemos ajudar hoje?</div></div>
-            <div style="display:flex; gap:5px">
-                <input type="text" id="chatInput" placeholder="Mensagem..." style="flex:1; padding:12px; border-radius:20px; border:1px solid #ddd; outline:none;">
-                <button onclick="enviarMensagem()" style="background:var(--primaria); color:white; border:none; border-radius:50%; width:42px; height:42px;">➔</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modalAvaliar" class="modal-overlay" onclick="fecharModal(event, 'modalAvaliar')">
-        <div class="modal-window" style="text-align: center;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0">Avaliação</h3>
-                <span style="cursor:pointer; font-size:24px;" onclick="document.getElementById('modalAvaliar').style.display='none'">&times;</span>
-            </div>
-            <div style="font-size:40px; color:#D4AF37; margin:20px">★★★★★</div>
-            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
-        </div>
-    </div>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         window.onload = () => {
@@ -201,52 +175,17 @@
         };
 
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 16);
-        var userMarker, km = 0, cat = "Econômico";
-
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         map.locate({setView: true, maxZoom: 17});
-        map.on('locationfound', e => {
-            userMarker = L.circleMarker(e.latlng, {radius: 8, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 3}).addTo(map);
-        });
-
-        async function buscarDestino() {
-            let input = document.getElementById('destInput').value;
-            if(!input) return;
-            let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}, Imperatriz`);
-            let data = await res.json();
-            if(data.length > 0) {
-                let local = [data[0].lat, data[0].lon];
-                L.marker(local).addTo(map);
-                map.flyTo(local, 17);
-                L.polyline([userMarker.getLatLng(), local], {color: '#c71585', weight: 4}).addTo(map);
-                km = userMarker.getLatLng().distanceTo(local) / 1000;
-                document.getElementById('p-eco').innerText = "R$ " + (km * 2.8 + 6).toFixed(2);
-                document.getElementById('p-black').innerText = "R$ " + (km * 4.5 + 10).toFixed(2);
-            }
-        }
-
-        function enviarMensagem() {
-            let inp = document.getElementById('chatInput');
-            let area = document.getElementById('chatMsg');
-            if(inp.value) {
-                area.innerHTML += `<div class="msg me">${inp.value}</div>`;
-                inp.value = '';
-                area.scrollTop = area.scrollHeight;
-            }
-        }
-
-        function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        
         function selectType(id) {
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             document.getElementById('card-' + id).classList.add('active');
-            cat = id === 'eco' ? "Econômico" : "Premium";
         }
-
-        function confirmarViagem() {
-            if(km === 0) alert("Por favor, busque um destino!");
-            else alert(`✅ Confirmado!\nMotorista: Maria Oliveira\nVeículo: ${cat === "Econômico" ? "Kwid" : "Corolla"}`);
-        }
+        function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        
+        function confirmarViagem() { alert("✅ Mobilize Confirmado!"); }
     </script>
 </body>
 </html>
