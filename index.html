@@ -36,9 +36,9 @@
         #splash h2 { color: var(--topo-texto); font-size: 28px; letter-spacing: 4px; margin: 0; font-weight: bold; }
         #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.8; }
 
-        /* Barra de Progresso com Carrinho de Frente */
+        /* BARRA DE PROGRESSO COM DISTANCIAMENTO */
         .progress-container {
-            width: 250px;
+            width: 260px;
             height: 35px;
             border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 8px;
@@ -52,20 +52,29 @@
             height: 100%;
             width: 0;
             background: white;
-            animation: fillBar 3s linear forwards;
+            animation: fillBar 3.2s ease-in-out forwards;
         }
         .car-loader {
             position: absolute;
             top: 50%;
-            transform: translateY(-50%) scaleX(-1); /* Vira o carro para frente (direita) */
+            transform: translateY(-50%) scaleX(-1); 
             width: 35px;
-            left: -40px;
+            left: -50px;
             filter: brightness(0) invert(1);
-            animation: driveCar 3s linear forwards;
+            animation: driveCar 3.5s ease-in-out forwards;
         }
 
-        @keyframes fillBar { 0% { width: 0; } 100% { width: 78%; } } /* Para antes do carro */
-        @keyframes driveCar { 0% { left: -40px; } 100% { left: 82%; } }
+        /* Animações Sincronizadas com Espaçamento */
+        @keyframes fillBar { 
+            0% { width: 0; } 
+            85% { width: 75%; } /* Barra mantém distância do carro */
+            100% { width: 100%; } /* No final, preenche tudo */
+        }
+        @keyframes driveCar { 
+            0% { left: -50px; } 
+            80% { left: 75%; } /* Carro corre à frente da barra */
+            100% { left: 110%; } /* Carro sai da tela com tudo */
+        }
 
         /* Interface Principal */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
@@ -78,7 +87,6 @@
 
         #map { flex: 1; width: 100%; z-index: 1; }
 
-        /* Painel Inferior */
         .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.08); }
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
         .card { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 5px; border: 2px solid #f0f0f0; border-radius: 15px; text-align: center; }
@@ -91,7 +99,6 @@
 
         .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; }
 
-        /* ASSINATURA REFORÇADA NATANAEL */
         .footer-powered { text-align: center; font-size: 11px; color: #444; padding-top: 12px; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
         .footer-powered span { color: var(--primaria); }
 
@@ -180,13 +187,13 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Lógica da Splash
+        // Splash logic
         window.onload = () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash');
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.display = 'none', 800);
-            }, 3000); 
+            }, 4000); // Aumentei um pouco o tempo para ver o carro sair da tela
         };
 
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 16);
