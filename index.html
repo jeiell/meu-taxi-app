@@ -16,66 +16,52 @@
             --topo-texto: #D4AF37; 
             --fundo-app: #fff0f5; 
             --primaria: #c71585; 
-            --preto: #1a1a1a; 
         }
 
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
-        /* Interface Principal */
+        /* Estilos de Interface */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
 
         .search-box { position: absolute; top: 60px; width: 90%; left: 5%; z-index: 1000; display: flex; }
-        .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); outline: none; font-size: 14px; }
+        .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); outline: none; }
         .search-box button { background: var(--primaria); color: white; border: none; border-radius: 0 20px 20px 0; width: 45px; cursor: pointer; }
 
         #map { flex: 1; width: 100%; z-index: 1; }
 
-        /* Painel Inferior */
         .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.08); }
 
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
-        .card { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 12px 5px; 
-            border: 2px solid #f0f0f0; 
-            border-radius: 15px; 
-            text-align: center;
-        }
+        .card { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 5px; border: 2px solid #f0f0f0; border-radius: 15px; text-align: center; }
         .card.active { border-color: var(--primaria); background: #fffcfd; }
         .card img { width: 42px; margin-bottom: 8px; }
-        .card-data { display: flex; justify-content: center; gap: 5px; width: 100%; border-top: 1px solid #f9f9f9; padding-top: 6px; }
-        .card-data strong { font-size: 12px; color: #333; }
-        .card-data span { font-weight: bold; font-size: 12px; color: var(--primaria); }
+        .card-data { display: flex; justify-content: center; gap: 5px; width: 100%; border-top: 1px solid #f9f9f9; padding-top: 6px; font-size: 12px; }
 
         .interaction-bar { display: flex; gap: 10px; margin-bottom: 15px; }
         .inter-btn { flex: 1; padding: 12px; background: #f5f5f5; border-radius: 12px; color: #555; font-size: 13px; font-weight: bold; border: none; }
 
         .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; box-shadow: 0 4px 10px rgba(199, 21, 133, 0.3); }
 
-        /* ASSINATURA POWERED BY */
+        /* ASSINATURA REFORÇADA */
         .footer-powered { 
             text-align: center; 
-            font-size: 10px; 
-            color: #ccc; 
-            padding-top: 12px; 
-            letter-spacing: 1.5px;
-            font-weight: 300;
+            font-size: 11px; /* Um pouco maior */
+            color: #555; /* Cinza escuro para dar peso */
+            padding-top: 15px; 
+            letter-spacing: 2px;
+            font-weight: 700; /* Negrito */
             text-transform: uppercase;
+            opacity: 0.9;
         }
+        .footer-powered span { color: var(--primaria); } /* Nome em destaque */
 
-        /* Modais Deslizantes */
+        /* Modais */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; align-items: flex-end; }
         .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 25px; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .star-rating { font-size: 38px; color: #ddd; text-align: center; margin: 20px 0; }
-        .star-rating span.active { color: var(--topo-texto); }
     </style>
 </head>
 <body>
@@ -96,17 +82,11 @@
         <div class="car-options">
             <div id="card-eco" class="card active" onclick="selectType('eco')">
                 <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png">
-                <div class="card-data">
-                    <strong>Econômico</strong>
-                    <span id="p-eco">R$ 0,00</span>
-                </div>
+                <div class="card-data"><strong>Econômico</strong> <span id="p-eco">R$ 0,00</span></div>
             </div>
             <div id="card-black" class="card" onclick="selectType('black')">
                 <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
-                <div class="card-data">
-                    <strong>Premium</strong>
-                    <span id="p-black">R$ 0,00</span>
-                </div>
+                <div class="card-data"><strong>Premium</strong> <span id="p-black">R$ 0,00</span></div>
             </div>
         </div>
 
@@ -118,26 +98,15 @@
         <button class="btn-confirm" onclick="confirmarViagem()">Confirmar Mobilize</button>
         
         <div class="footer-powered">
-            POWERED BY NATANAEL TEIXEIRA
+            ⚡ Powered by <span>Natanael Teixeira</span>
         </div>
     </div>
 
     <div id="modalChat" class="modal-overlay" onclick="fecharModal(event, 'modalChat')">
-        <div class="modal-window">
-            <div class="modal-header"><h3>Suporte</h3><span onclick="document.getElementById('modalChat').style.display='none'">&times;</span></div>
-            <p style="font-size:14px; color:#666">Olá! Como podemos ajudar hoje?</p>
-            <input type="text" placeholder="Digite sua dúvida..." style="width:100%; padding:14px; border-radius:25px; border:1px solid #ddd; outline:none;">
-        </div>
+        <div class="modal-window"><h3>Chat</h3><p>Suporte ativo.</p></div>
     </div>
-
     <div id="modalAvaliar" class="modal-overlay" onclick="fecharModal(event, 'modalAvaliar')">
-        <div class="modal-window" style="text-align: center;">
-            <div class="modal-header"><h3>Avaliar</h3><span onclick="document.getElementById('modalAvaliar').style.display='none'">&times;</span></div>
-            <div class="star-rating">
-                <span onclick="setStars(1)">★</span><span onclick="setStars(2)">★</span><span onclick="setStars(3)">★</span><span onclick="setStars(4)">★</span><span onclick="setStars(5)">★</span>
-            </div>
-            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
-        </div>
+        <div class="modal-window" style="text-align: center;"><h3>Avaliar</h3><p>⭐⭐⭐⭐⭐</p></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -176,15 +145,11 @@
 
         function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
         function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
-        function setStars(n) {
-            let stars = document.querySelectorAll('.star-rating span');
-            stars.forEach((s, i) => s.classList.toggle('active', i < n));
-        }
 
         function confirmarViagem() {
-            if(km === 0) return alert("Por favor, informe seu destino!");
+            if(km === 0) return alert("Busque o destino!");
             let carro = cat === "Econômico" ? "Kwid - MOB-2024" : "Corolla - LUX-5050";
-            alert(`✅ Mobilize Confirmado!\nMotorista: Maria Oliveira\nVeículo: ${carro}`);
+            alert(`✅ Confirmado!\nMotorista: Maria Oliveira\nVeículo: ${carro}`);
         }
     </script>
 </body>
