@@ -46,9 +46,9 @@
 
         .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
-        .card { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 5px; border: 2px solid #f0f0f0; border-radius: 15px; transition: 0.3s; }
+        .card { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 5px; border: 2px solid #f0f0f0; border-radius: 15px; }
         .card.active { border-color: var(--primaria); background: #fffcfd; }
-        .card img { width: 45px; margin-bottom: 5px; } /* Aumentei um pouco pra dar presença */
+        .card img { width: 45px; margin-bottom: 5px; }
 
         .interaction-bar { display: flex; gap: 10px; margin-bottom: 15px; }
         .inter-btn { flex: 1; padding: 12px; background: #f5f5f5; border-radius: 12px; border: none; font-weight: bold; font-size: 13px; color: #555; cursor: pointer; }
@@ -63,8 +63,10 @@
         .msg { padding: 8px; border-radius: 10px; font-size: 13px; max-width: 80%; }
         .msg.bot { background: #eee; align-self: flex-start; }
         .msg.me { background: #dcf8c6; align-self: flex-end; }
+
         .modal-sos-alert { align-items: center; justify-content: center; padding: 20px; }
         .modal-sos-alert .modal-window { border-radius: 25px; max-width: 320px; text-align: center; margin: auto; }
+        .stars { font-size: 30px; color: #D4AF37; margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -126,9 +128,17 @@
     <div id="modalSOS" class="modal-overlay modal-sos-alert" onclick="fecharModal(event, 'modalSOS')">
         <div class="modal-window">
             <h2 style="color:red; margin-top:0;">ALERTA SOS</h2>
-            <p style="font-size: 14px;">Deseja acionar a emergência? A PRF será notificada.</p>
+            <p style="font-size: 14px; color: #444;">Deseja acionar a emergência? <b>As autoridades locais e nossa central</b> serão notificadas imediatamente.</p>
             <button class="btn-confirm" style="background:red; margin-bottom:10px;" onclick="dispararAlertaReal()">SIM, AJUDA!</button>
             <button class="inter-btn" style="width:100%" onclick="document.getElementById('modalSOS').style.display='none'">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="modalAvaliar" class="modal-overlay modal-sos-alert" onclick="fecharModal(event, 'modalAvaliar')">
+        <div class="modal-window">
+            <h3>Avaliar Viagem</h3>
+            <div class="stars">★★★★★</div>
+            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
         </div>
     </div>
 
@@ -156,7 +166,7 @@
 
         function dispararAlertaReal() {
             if (navigator.vibrate) navigator.vibrate([100,100,100, 300,100,300,100,300, 100,100,100]);
-            alert("🚨 SOS ENVIADO!");
+            alert("🚨 ALERTA ENVIADO! Autoridades e Central notificadas.");
             document.getElementById('modalSOS').style.display = 'none';
         }
 
@@ -181,6 +191,7 @@
         }
         function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
         function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        
         function enviarMensagem() {
             let inp = document.getElementById('chatInput');
             if(inp.value) {
