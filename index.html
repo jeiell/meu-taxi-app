@@ -12,6 +12,8 @@
     <link rel="apple-touch-icon" href="icon-1024.png">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    
     <style>
         :root { 
             --topo-fundo: #4a148c; 
@@ -47,6 +49,10 @@
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
         
         #map { flex: 1; width: 100%; z-index: 1; }
+        
+        /* Esconder a tabela de instruções do Leaflet Routing */
+        .leaflet-routing-container { display: none !important; }
+
         .search-box { position: absolute; top: 65px; width: 90%; left: 5%; z-index: 1000; display: flex; }
         .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); outline: none; }
         .search-box button { background: var(--primaria); color: white; border: none; border-radius: 0 20px 20px 0; width: 45px; cursor: pointer; }
@@ -148,79 +154,100 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log("SW error", err));
-    }
-
-    window.onload = () => {
-        setTimeout(() => {
-            document.getElementById('splash').style.opacity = '0';
-            setTimeout(() => document.getElementById('splash').style.display = 'none', 800);
-        }, 4000); 
-    };
-
-    // Inicialização do Mapa
-    var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-    var userLocation;
-    var destMarker;
-
-    // Localização do Usuário (Ponto de Partida)
-    map.locate({setView: true, maxZoom: 16});
-    map.on('locationfound', e => {
-        userLocation = e.latlng;
-        L.circleMarker(e.latlng, {radius: 7, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 2}).addTo(map)
-            .bindPopup("Você está aqui").openPopup();
-    });
-
-    async function buscarDestino() {
-        let input = document.getElementById('destInput').value;
-        if(!input || !userLocation) return;
-
-        // Limpa o marcador de destino anterior para não encher o mapa de pins
-        if (destMarker) { map.removeLayer(destMarker); }
-
-        let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}, Imperatriz`);
-        let data = await res.json();
-
-        if(data.length > 0) {
-            let destLatLng = [data[0].lat, data[0].lon];
-            
-            // Adiciona o novo pin de destino
-            destMarker = L.marker(destLatLng).addTo(map);
-            map.flyTo(destLatLng, 16);
-
-            // CÁLCULO DE DISTÂNCIA REAL (pela rua)
-            // Para um app profissional, o ideal é usar o Leaflet Routing Machine.
-            // Aqui calculamos a distância para atualizar os preços no seu painel:
-            let dist = userLocation.distanceTo(destLatLng) / 1000; // Distância em KM
-            
-            document.getElementById('p-eco').innerText = "R$ " + (dist * 2.8 + 6).toFixed(2); // Ajustei levemente a taxa
-            document.getElementById('p-black').innerText = "R$ " + (dist * 4.5 + 10).toFixed(2);
-        } else {
-            alert("Endereço não encontrado. Tente ser mais específico.");
-        }
-    }
-
-    // Restante das suas funções (selectType, toggleModal, etc) permanecem iguais
-    function selectType(id) {
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-        document.getElementById('card-' + id).classList.add('active');
-    }
-    function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
-    function enviarMensagem() {
-        let inp = document.getElementById('chatInput');
-        if(inp.value) {
-            document.getElementById('chatMsg').innerHTML += `<div class="msg me">${inp.value}</div>`;
-            inp.value = '';
-            document.getElementById('chatMsg').scrollTop = 9999;
-        }
-    }
-    function confirmarViagem() { alert("✅ Mobilize Confirmado!"); }
-</script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
     
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log("SW error", err));
+        }
+
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(() => document.getElementById('splash').style.display = 'none', 800);
+            }, 4000); 
+        };
+
+        // Inicialização do Mapa
+        var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        var userLocation;
+        var routingControl;
+        var destMarker;
+
+        // Localização do Usuário
+        map.locate({setView: true, maxZoom: 16});
+        map.on('locationfound', e => {
+            userLocation = e.latlng;
+            L.circleMarker(e.latlng, {radius: 7, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 2}).addTo(map)
+                .bindPopup("Você está aqui").openPopup();
+        });
+
+        async function buscarDestino() {
+            let input = document.getElementById('destInput').value;
+            if(!input || !userLocation) return;
+
+            // Remove rota e marcador anterior
+            if (routingControl) { map.removeControl(routingControl); }
+            if (destMarker) { map.removeLayer(destMarker); }
+
+            let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}`);
+            let data = await res.json();
+
+            if(data.length > 0) {
+                let destLatLng = L.latLng(data[0].lat, data[0].lon);
+                
+                // Marcador no destino
+                destMarker = L.marker(destLatLng).addTo(map);
+
+                // Desenha a Rota Azul
+                routingControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(userLocation.lat, userLocation.lng),
+                        destLatLng
+                    ],
+                    lineOptions: {
+                        styles: [{ color: '#2672ec', weight: 6, opacity: 0.8 }]
+                    },
+                    createMarker: function() { return null; },
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    fitSelectedRoutes: true,
+                    show: false
+                }).addTo(map);
+
+                // Calcula distância e preço
+                routingControl.on('routesfound', function(e) {
+                    var routes = e.routes;
+                    var distance = routes[0].summary.totalDistance / 1000;
+                    document.getElementById('p-eco').innerText = "R$ " + (distance * 2.8 + 6).toFixed(2);
+                    document.getElementById('p-black').innerText = "R$ " + (distance * 4.5 + 10).toFixed(2);
+                });
+
+            } else {
+                alert("Endereço não encontrado.");
+            }
+        }
+
+        // Funções auxiliares
+        function selectType(id) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.getElementById('card-' + id).classList.add('active');
+        }
+        function acionarSOS() { if (navigator.vibrate) navigator.vibrate(150); toggleModal('modalSOS'); }
+        function dispararAlertaReal() { alert("🚨 SOS ENVIADO!"); document.getElementById('modalSOS').style.display = 'none'; }
+        function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        function enviarMensagem() {
+            let inp = document.getElementById('chatInput');
+            if(inp.value) {
+                document.getElementById('chatMsg').innerHTML += `<div class="msg me">${inp.value}</div>`;
+                inp.value = '';
+                document.getElementById('chatMsg').scrollTop = 9999;
+            }
+        }
+        function confirmarViagem() { alert("✅ Mobilize Confirmado!"); }
+    </script>
 </body>
 </html>
