@@ -11,13 +11,11 @@
             --topo-texto: #D4AF37; 
             --fundo-app: #fff0f5; 
             --primaria: #c71585; 
-            --preto: #1a1a1a; 
         }
 
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
-        /* Header e Busca */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
@@ -28,44 +26,52 @@
 
         #map { flex: 1; width: 100%; z-index: 1; }
 
-        /* Painel Inferior */
-        .bottom-panel { background: white; padding: 15px; border-radius: 20px 20px 0 0; z-index: 10; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+        /* Painel Inferior Reestruturado */
+        .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 10; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
-        .card { flex: 1; display: flex; align-items: center; padding: 10px; border: 2px solid #f0f0f0; border-radius: 12px; }
+        
+        /* Cartões Verticais */
+        .card { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            padding: 12px 5px; 
+            border: 2px solid #f0f0f0; 
+            border-radius: 15px; 
+            text-align: center;
+            transition: 0.2s;
+        }
         .card.active { border-color: var(--primaria); background: #fffcfd; }
-        .card img { width: 35px; margin-right: 10px; }
-        .price { font-weight: bold; font-size: 15px; }
+        
+        .card img { width: 45px; height: auto; margin-bottom: 8px; }
+        
+        .card-data { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 5px; 
+            width: 100%; 
+            border-top: 1px solid #f9f9f9;
+            padding-top: 5px;
+        }
+        .card-data strong { font-size: 13px; color: #333; }
+        .card-data span { font-weight: bold; font-size: 13px; color: var(--primaria); }
 
         .interaction-bar { display: flex; gap: 10px; margin-bottom: 12px; }
-        .inter-btn { flex: 1; padding: 10px; background: #f5f5f5; border-radius: 10px; color: #555; font-size: 13px; font-weight: bold; border: none; }
+        .inter-btn { flex: 1; padding: 12px; background: #f5f5f5; border-radius: 12px; color: #555; font-size: 13px; font-weight: bold; border: none; }
 
-        .confirm-container { width: 100%; padding: 0 10px; }
-        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 15px; border-radius: 15px; border: none; font-size: 16px; font-weight: bold; }
+        .confirm-container { width: 100%; padding: 0 5px; }
+        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; }
 
-        /* MODAIS ESTILO WHATSAPP/FLUTUANTE */
-        .modal-overlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.4); z-index: 2000; align-items: flex-end; 
-        }
-        .modal-window { 
-            background: white; width: 100%; border-radius: 25px 25px 0 0; 
-            padding: 20px; animation: slideUp 0.3s ease-out; max-height: 80vh; overflow-y: auto;
-        }
+        /* Modais */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; align-items: flex-end; }
+        .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 20px; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .modal-header h3 { margin: 0; color: var(--primaria); font-size: 18px; }
-        .close-x { font-size: 24px; cursor: pointer; color: #aaa; }
-
-        /* Estilo Chat Bolhas */
-        .chat-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 14px; line-height: 1.4; }
-        .msg.bot { background: #f1f1f1; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .msg.user { background: #e1ffc7; align-self: flex-end; border-bottom-right-radius: 2px; }
-
-        /* Estilo Estrelas */
-        .star-rating { font-size: 40px; color: #ddd; text-align: center; margin: 20px 0; }
-        .star-rating span { cursor: pointer; transition: 0.2s; }
+        .star-rating { font-size: 35px; color: #ddd; text-align: center; margin: 15px 0; }
         .star-rating span.active { color: var(--topo-texto); }
     </style>
 </head>
@@ -77,7 +83,7 @@
     </div>
 
     <div class="search-box">
-        <input type="text" id="destInput" placeholder="Para onde vamos?">
+        <input type="text" id="destInput" placeholder="Aonde vamos hoje?">
         <button onclick="buscarDestino()">🔍</button>
     </div>
 
@@ -87,13 +93,17 @@
         <div class="car-options">
             <div id="card-eco" class="card active" onclick="selectType('eco')">
                 <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png">
-                <div style="flex:1"><strong>Econômico</strong></div>
-                <div class="price" id="p-eco">R$ 0,00</div>
+                <div class="card-data">
+                    <strong>Econômico</strong>
+                    <span id="p-eco">R$ 0,00</span>
+                </div>
             </div>
             <div id="card-black" class="card" onclick="selectType('black')">
                 <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
-                <div style="flex:1"><strong>Premium</strong></div>
-                <div class="price" id="p-black">R$ 0,00</div>
+                <div class="card-data">
+                    <strong>Premium</strong>
+                    <span id="p-black">R$ 0,00</span>
+                </div>
             </div>
         </div>
 
@@ -109,32 +119,19 @@
 
     <div id="modalChat" class="modal-overlay" onclick="fecharModal(event, 'modalChat')">
         <div class="modal-window">
-            <div class="modal-header">
-                <h3>Conversa com Suporte</h3>
-                <span class="close-x" onclick="document.getElementById('modalChat').style.display='none'">&times;</span>
-            </div>
-            <div class="chat-box">
-                <div class="msg bot">Olá! Como podemos ajudar você hoje?</div>
-                <div class="msg bot">Nossas motoristas parceiras estão prontas para te atender.</div>
-            </div>
-            <div style="display:flex; gap:5px;">
-                <input type="text" placeholder="Digite sua mensagem..." style="flex:1; padding:10px; border-radius:20px; border:1px solid #ddd; outline:none;">
-                <button style="background:var(--primaria); color:white; border:none; border-radius:50%; width:40px; height:40px;">➔</button>
-            </div>
+            <div class="modal-header"><h3>Chat</h3><span onclick="document.getElementById('modalChat').style.display='none'">&times;</span></div>
+            <p style="font-size:14px; color:#666">Suporte Mobilize: Olá! Como podemos ajudar?</p>
+            <input type="text" placeholder="Mensagem..." style="width:100%; padding:12px; border-radius:20px; border:1px solid #ddd; outline:none;">
         </div>
     </div>
 
     <div id="modalAvaliar" class="modal-overlay" onclick="fecharModal(event, 'modalAvaliar')">
         <div class="modal-window" style="text-align: center;">
-            <div class="modal-header">
-                <h3>Avalie sua Viagem</h3>
-                <span class="close-x" onclick="document.getElementById('modalAvaliar').style.display='none'">&times;</span>
-            </div>
-            <p>Sua opinião é muito importante para a segurança de todas.</p>
+            <div class="modal-header"><h3>Avalie</h3><span onclick="document.getElementById('modalAvaliar').style.display='none'">&times;</span></div>
             <div class="star-rating">
                 <span onclick="setStars(1)">★</span><span onclick="setStars(2)">★</span><span onclick="setStars(3)">★</span><span onclick="setStars(4)">★</span><span onclick="setStars(5)">★</span>
             </div>
-            <button class="btn-confirm" onclick="alert('Obrigada pela avaliação!'); document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
+            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar</button>
         </div>
     </div>
 
@@ -159,7 +156,7 @@
                 let local = [data[0].lat, data[0].lon];
                 L.marker(local).addTo(map);
                 map.flyTo(local, 17);
-                L.polyline([userMarker.getLatLng(), local], {color: '#c71585', weight: 4, dashArray: '8, 8'}).addTo(map);
+                L.polyline([userMarker.getLatLng(), local], {color: '#c71585', weight: 4}).addTo(map);
                 km = userMarker.getLatLng().distanceTo(local) / 1000;
                 document.getElementById('p-eco').innerText = "R$ " + (km * 2.8 + 6).toFixed(2);
                 document.getElementById('p-black').innerText = "R$ " + (km * 4.5 + 10).toFixed(2);
@@ -173,19 +170,15 @@
         }
 
         function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
-        
-        function fecharModal(e, id) {
-            if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none';
-        }
-
+        function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
         function setStars(n) {
             let stars = document.querySelectorAll('.star-rating span');
             stars.forEach((s, i) => s.classList.toggle('active', i < n));
         }
 
         function confirmarViagem() {
-            if(km === 0) return alert("Busque um destino primeiro!");
-            let carro = cat === "Econômico" ? "Renault Kwid - MOB-2024" : "Toyota Corolla - LUX-5050";
+            if(km === 0) return alert("Busque um destino!");
+            let carro = cat === "Econômico" ? "Kwid - MOB-2024" : "Corolla - LUX-5050";
             alert(`✅ Confirmado!\nMotorista: Maria Oliveira\nVeículo: ${carro}`);
         }
     </script>
