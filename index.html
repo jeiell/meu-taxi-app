@@ -3,49 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobilize Car | Feminino</title>
+    <title>Mobilize Car Feminino | Imperatriz</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root { --primaria: #800020; --secundaria: #D4AF37; --fundo: #fff5f7; --texto: #333; }
+        /* NOVA PALETA DE CORES: ROSA, LILÁS E DOURADO */
+        :root { 
+            --topo-fundo: #4a148c; /* Lilás bem escuro para contraste */
+            --topo-texto: #D4AF37; /* Dourado profissional */
+            --fundo-app: #fff0f5; /* Rosa lavanda bem claro */
+            --primaria: #c71585; /* Rosa médio (Bordeaux suave) */
+            --preto: #1a1a1a; 
+            --branco: #fff;
+        }
+
         * { box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: 'Segoe UI', sans-serif; background: var(--fundo); }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
-        /* Header Profissional */
-        .header { background: var(--primaria); color: white; padding: 15px; text-align: center; z-index: 1001; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .header h1 { margin: 0; font-size: 20px; letter-spacing: 2px; color: var(--secundaria); }
-        .header p { margin: 0; font-size: 10px; text-transform: uppercase; opacity: 0.8; }
+        /* Header Compacto */
+        .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
+        .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
+        .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
 
-        /* Busca com Lupa */
-        .search-box { position: absolute; top: 75px; width: 94%; left: 3%; z-index: 1000; display: flex; gap: 5px; }
-        .search-box input { flex: 1; padding: 15px; border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); outline: none; }
-        .search-box button { background: var(--primaria); color: white; border: none; border-radius: 12px; width: 50px; cursor: pointer; font-size: 20px; }
+        /* Busca Integrada */
+        .search-box { position: absolute; top: 60px; width: 90%; left: 5%; z-index: 1000; display: flex; }
+        .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.1); outline: none; }
+        .search-box button { background: var(--primaria); color: white; border: none; border-radius: 0 20px 20px 0; width: 45px; cursor: pointer; }
 
         #map { flex: 1; width: 100%; z-index: 1; }
 
-        /* Painel Completo Exposto */
-        .main-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); max-height: 50%; overflow-y: auto; }
-        
-        .section-title { font-size: 12px; font-weight: bold; color: #888; margin: 10px 0; text-transform: uppercase; }
+        /* Painel Inferior Slim */
+        .bottom-panel { background: white; padding: 15px; border-radius: 20px 20px 0 0; z-index: 10; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
 
-        /* Categorias */
-        .options { display: flex; gap: 10px; margin-bottom: 15px; }
-        .card { flex: 1; padding: 10px; border: 2px solid #eee; border-radius: 15px; text-align: center; transition: 0.3s; }
-        .card.active { border-color: var(--primaria); background: #fff0f3; }
-        .card.red { color: #d32f2f; }
-        .card.black { color: #1a1a1a; }
-        .card img { width: 40px; display: block; margin: 0 auto 5px; }
-        .card strong { font-size: 14px; }
+        /* Opções de Carro */
+        .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
+        .card { flex: 1; display: flex; align-items: center; padding: 10px; border: 2px solid #f0f0f0; border-radius: 12px; }
+        .card.active { border-color: var(--primaria); background: #fffcfd; }
+        .card img { width: 35px; margin-right: 10px; }
+        .card-info { flex: 1; }
+        .card-info strong { font-size: 14px; display: block; }
+        .card-info small { color: #888; font-size: 11px; }
+        .price { font-weight: bold; font-size: 15px; color: var(--preto); }
 
-        /* Chat Visível */
-        .chat-preview { background: #f9f9f9; border-radius: 12px; padding: 10px; margin-bottom: 15px; border-left: 4px solid var(--secundaria); }
-        .chat-preview p { margin: 5px 0; font-size: 13px; color: #555; }
+        /* Linha de Interação (Chat e Rating) */
+        .interaction-bar { display: flex; gap: 10px; margin-bottom: 12px; }
+        .inter-btn { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 10px; color: #555; font-size: 13px; font-weight: bold; border: none; }
+        .inter-btn.active { color: var(--primaria); background: #fffdf0; }
+        .icon-small { font-size: 16px; margin-right: 5px; }
 
-        /* Avaliação Rápida */
-        .rating-box { text-align: center; margin-bottom: 15px; border-top: 1px solid #eee; padding-top: 10px; }
-        .stars { font-size: 24px; color: #ddd; }
-        .stars span.active { color: var(--secundaria); }
+        /* Botão de Confirmação com Bordas */
+        .confirm-container { width: 100%; padding: 0 10px; /* Margem lateral */ }
+        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 15px; border-radius: 15px; border: none; font-size: 16px; font-weight: bold; }
 
-        .btn-go { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 18px; font-weight: bold; }
+        /* Modais do Chat e Avaliação */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 85%; max-width: 320px; text-align: center; }
+        .close-btn { color: #aaa; float: right; font-size: 20px; font-weight: bold; cursor: pointer; }
+        .chat-input { width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
+        .stars { font-size: 30px; color: #ddd; margin: 10px 0; }
+        .stars span { cursor: pointer; }
+        .stars span.active { color: var(--topo-texto); }
     </style>
 </head>
 <body>
@@ -56,93 +72,112 @@
     </div>
 
     <div class="search-box">
-        <input type="text" id="destInput" placeholder="Digite o endereço de destino...">
-        <button onclick="buscarEndereco()">🔍</button>
+        <input type="text" id="destInput" placeholder="Aonde você quer ir?">
+        <button onclick="buscarDestino()">🔍</button>
     </div>
 
     <div id="map"></div>
 
-    <div class="main-panel">
-        <div class="section-title">Escolha sua Categoria</div>
-        <div class="options">
-            <div id="card-eco" class="card red active" onclick="select(1, 2.5)">
+    <div class="bottom-panel">
+        <div class="car-options">
+            <div id="card-eco" class="card active" onclick="selectType('eco', 2.80)">
                 <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png">
-                <strong>Econômico</strong><br><small id="p-eco">R$ 0,00</small>
+                <div class="card-info">
+                    <strong>Econômico</strong><small>Carro Vermelho</small>
+                </div>
+                <div class="price" id="p-eco">R$ 0,00</div>
             </div>
-            <div id="card-premium" class="card black" onclick="select(2, 4.0)">
+            <div id="card-black" class="card" onclick="selectType('black', 4.50)">
                 <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
-                <strong>Premium</strong><br><small id="p-pre">R$ 0,00</small>
+                <div class="card-info">
+                    <strong>Black</strong><small>Mais rápido</small>
+                </div>
+                <div class="price" id="p-black">R$ 0,00</div>
             </div>
         </div>
 
-        <div class="section-title">Chat com a Motorista</div>
-        <div class="chat-preview">
-            <p><strong>Maria (Motorista):</strong> Olá! Já estou a caminho do ponto de embarque.</p>
-            <input type="text" placeholder="Responder para Maria..." style="width:100%; border:none; background:none; font-size:12px; outline:none; border-bottom:1px solid #ddd">
+        <div class="interaction-bar">
+            <button class="inter-btn active" onclick="openModal('modalChat')">
+                <span class="icon-small">💬</span> Chat com Maria
+            </button>
+            <button class="inter-btn" onclick="openModal('modalAvaliacao')">
+                <span class="icon-small">⭐</span> Avalie aqui
+            </button>
         </div>
 
-        <div class="rating-box">
-            <div class="section-title">Avalie sua última experiência</div>
+        <div class="confirm-container">
+            <button class="btn-confirm" onclick="confirmar()">Confirmar Mobilize</button>
+        </div>
+    </div>
+
+    <div id="modalChat" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modalChat')">&times;</span>
+            <h4>Falar com Motorista</h4>
+            <div style="text-align: left; font-size: 13px; color: #555;">
+                <p><strong>Maria (Motorista):</strong> Olá! Estou a 3 minutos do ponto de embarque.</p>
+            </div>
+            <input type="text" class="chat-input" placeholder="Responder para Maria...">
+        </div>
+    </div>
+
+    <div id="modalAvaliacao" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modalAvaliacao')">&times;</span>
+            <h4>Avalie sua Experiência</h4>
             <div class="stars">
-                <span class="active">★</span><span class="active">★</span><span class="active">★</span><span class="active">★</span><span>★</span>
+                <span onclick="rate(1)">★</span><span onclick="rate(2)">★</span><span onclick="rate(3)">★</span><span onclick="rate(4)">★</span><span onclick="rate(5)">★</span>
             </div>
+            <button class="btn-confirm" onclick="closeModal('modalAvaliacao')">Enviar Avaliação</button>
         </div>
-
-        <button class="btn-go" onclick="confirmar()">Confirmar Mobilize</button>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 14);
-        var userM, destM, route, currentDist = 0;
+        var userMarker, km = 0;
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         map.locate({setView: true, maxZoom: 16});
         map.on('locationfound', e => {
-            userM = L.circleMarker(e.latlng, {radius: 8, color: '#fff', fillColor: '#800020', fillOpacity: 1, weight: 3}).addTo(map);
+            if (userMarker) map.removeLayer(userMarker);
+            userMarker = L.circleMarker(e.latlng, {radius: 8, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 3}).addTo(map);
         });
 
-        // FUNÇÃO DE BUSCA REAL
-        async function buscarEndereco() {
-            let query = document.getElementById('destInput').value;
-            if(!query) return alert("Digite um endereço!");
-
-            let response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
-            let data = await response.json();
-
+        async function buscarDestino() {
+            let input = document.getElementById('destInput').value;
+            if(!input) return;
+            let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}, Imperatriz`);
+            let data = await res.json();
             if(data.length > 0) {
-                let lat = data[0].lat;
-                let lon = data[0].lon;
-                let local = [lat, lon];
-
-                if(destM) map.removeLayer(destM);
-                if(route) map.removeLayer(route);
-
-                destM = L.marker(local).addTo(map);
+                let local = [data[0].lat, data[0].lon];
+                L.marker(local).addTo(map);
                 map.flyTo(local, 15);
-                
-                route = L.polyline([userM.getLatLng(), local], {color: '#800020', weight: 4, dashArray: '10, 10'}).addTo(map);
-                
-                currentDist = userM.getLatLng().distanceTo(local) / 1000;
+                L.polyline([userMarker.getLatLng(), local], {color: '#c71585', dashArray: '8, 8'}).addTo(map);
+                km = userMarker.getLatLng().distanceTo(local) / 1000;
                 atualizarPrecos();
-            } else {
-                alert("Endereço não encontrado.");
             }
         }
 
-        function select(n, taxa) {
+        function selectType(id, rateKm) {
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            if(n==1) document.getElementById('card-eco').classList.add('active');
-            else document.getElementById('card-premium').classList.add('active');
+            document.getElementById('card-' + id).classList.add('active');
+            atualizarPrecos(rateKm);
         }
 
-        function atualizarPrecos() {
-            document.getElementById('p-eco').innerText = "R$ " + (currentDist * 2.5 + 6).toFixed(2);
-            document.getElementById('p-pre').innerText = "R$ " + (currentDist * 4.0 + 10).toFixed(2);
+        function atualizarPrecos(rate = 2.80) {
+            document.getElementById('p-eco').innerText = "R$ " + (km * 2.8 + 6).toFixed(2);
+            document.getElementById('p-black').innerText = "R$ " + (km * 4.5 + 10).toFixed(2);
         }
 
-        function confirmar() { alert("Solicitando sua motorista parceira..."); }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function rate(n) {
+            let stars = document.querySelectorAll('.stars span');
+            stars.forEach((s, i) => s.classList.toggle('active', i < n));
+        }
+        function confirmar() { if(km===0) alert("Busque o destino!"); else alert("Solicitando motorista..."); }
     </script>
 </body>
 </html>
