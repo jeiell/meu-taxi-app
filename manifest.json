@@ -1,6 +1,7 @@
 {
   "name": "Mobilize Car Oficial",
   "short_name": "Mobilize",
+  "description": "Aplicativo de Mobilidade Urbana",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#4a148c",
@@ -14,3 +15,4 @@
     }
   ]
 }
+
