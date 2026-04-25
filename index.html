@@ -21,7 +21,7 @@
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
-        /* TELA DE BOAS-VINDAS (SPLASH) */
+        /* SPLASH SCREEN CORRIGIDA */
         #splash {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -36,9 +36,8 @@
         #splash h2 { color: var(--topo-texto); font-size: 28px; letter-spacing: 4px; margin: 0; font-weight: bold; }
         #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.8; }
 
-        /* BARRA DE PROGRESSO COM DISTANCIAMENTO */
         .progress-container {
-            width: 260px;
+            width: 280px;
             height: 35px;
             border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 8px;
@@ -47,36 +46,43 @@
             background: rgba(255, 255, 255, 0.05);
             overflow: hidden;
         }
+
+        /* Barra de Progresso */
         .progress-bar {
             position: absolute;
             height: 100%;
-            width: 0;
+            width: 0%;
             background: white;
-            animation: fillBar 3.2s ease-in-out forwards;
+            /* Usando linear para manter a velocidade constante e não encostar no carro */
+            animation: fillBar 3s linear forwards;
         }
+
+        /* Carrinho */
         .car-loader {
             position: absolute;
             top: 50%;
             transform: translateY(-50%) scaleX(-1); 
             width: 35px;
-            left: -50px;
+            left: -40px;
             filter: brightness(0) invert(1);
-            animation: driveCar 3.5s ease-in-out forwards;
+            /* Mesma duração e velocidade linear para andarem juntos */
+            animation: driveCar 3s linear forwards;
         }
 
-        /* Animações Sincronizadas com Espaçamento */
-        @keyframes fillBar { 
-            0% { width: 0; } 
-            85% { width: 75%; } /* Barra mantém distância do carro */
-            100% { width: 100%; } /* No final, preenche tudo */
-        }
-        @keyframes driveCar { 
-            0% { left: -50px; } 
-            80% { left: 75%; } /* Carro corre à frente da barra */
-            100% { left: 110%; } /* Carro sai da tela com tudo */
+        /* Sincronização Perfeita */
+        @keyframes fillBar {
+            0% { width: 0%; }
+            80% { width: 70%; }  /* Mantém 10% de distância do carro até quase o fim */
+            100% { width: 100%; } /* Completa quando o carro já saiu */
         }
 
-        /* Interface Principal */
+        @keyframes driveCar {
+            0% { left: -40px; }
+            80% { left: 80%; }   /* O carro lidera a barra com folga */
+            100% { left: 120%; }  /* Carro sai da tela no final */
+        }
+
+        /* Restante do Layout Principal */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
@@ -187,13 +193,12 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Splash logic
         window.onload = () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash');
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.display = 'none', 800);
-            }, 4000); // Aumentei um pouco o tempo para ver o carro sair da tela
+            }, 3800); 
         };
 
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 16);
