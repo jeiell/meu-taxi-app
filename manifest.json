@@ -1,16 +1,16 @@
 {
-  "name": "Meu Aplicativo de Match",
-  "short_name": "MeuApp",
+  "name": "Mobilize Car Oficial",
+  "short_name": "Mobilize",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#6200ee",
-    "icons": [
+  "background_color": "#4a148c",
+  "theme_color": "#4a148c",
+  "icons": [
     {
-      "src": "icon-512.png",
+      "src": "icon-preenchido.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-   
-    ]
+  ]
 }
