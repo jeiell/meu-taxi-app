@@ -16,18 +16,35 @@
             --topo-texto: #D4AF37; 
             --fundo-app: #fff0f5; 
             --primaria: #c71585; 
-            --preto: #1a1a1a; 
         }
 
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
+        /* TELA DE BOAS-VINDAS (SPLASH SCREEN) */
+        #splash {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+            transition: opacity 0.8s ease;
+        }
+        #splash h2 { color: var(--topo-texto); font-size: 28px; letter-spacing: 4px; margin: 0; text-align: center; }
+        #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.9; }
+        .loader { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: var(--topo-texto); animation: spin 1s linear infinite; margin-top: 30px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Interface Principal */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
 
         .search-box { position: absolute; top: 60px; width: 90%; left: 5%; z-index: 1000; display: flex; }
-        .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); outline: none; font-size: 14px; }
+        .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); outline: none; }
         .search-box button { background: var(--primaria); color: white; border: none; border-radius: 0 20px 20px 0; width: 45px; cursor: pointer; }
 
         #map { flex: 1; width: 100%; z-index: 1; }
@@ -36,26 +53,15 @@
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
         .card { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px 5px; border: 2px solid #f0f0f0; border-radius: 15px; text-align: center; }
         .card.active { border-color: var(--primaria); background: #fffcfd; }
-        .card img { width: 42px; margin-bottom: 8px; }
-        .card-data { display: flex; justify-content: center; gap: 5px; width: 100%; border-top: 1px solid #f9f9f9; padding-top: 6px; }
-        .card-data strong { font-size: 12px; color: #333; }
-        .card-data span { font-weight: bold; font-size: 12px; color: var(--primaria); }
-
+        .card img { width: 40px; margin-bottom: 8px; }
+        
         .interaction-bar { display: flex; gap: 10px; margin-bottom: 15px; }
         .inter-btn { flex: 1; padding: 12px; background: #f5f5f5; border-radius: 12px; color: #555; font-size: 13px; font-weight: bold; border: none; }
 
-        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; box-shadow: 0 4px 10px rgba(199, 21, 133, 0.3); }
+        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; }
 
-        /* ASSINATURA REFORÇADA NATANAEL */
-        .footer-powered { 
-            text-align: center; 
-            font-size: 11px; 
-            color: #444; 
-            padding-top: 12px; 
-            letter-spacing: 2px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+        /* ASSINATURA NATANAEL */
+        .footer-powered { text-align: center; font-size: 11px; color: #444; padding-top: 12px; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
         .footer-powered span { color: var(--primaria); }
 
         /* Modais */
@@ -63,20 +69,19 @@
         .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 25px; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
-        /* CHAT FUNCIONAL */
         .chat-area { max-height: 150px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
         .msg { padding: 8px 12px; border-radius: 10px; font-size: 13px; max-width: 85%; }
         .msg.bot { background: #eee; align-self: flex-start; }
         .msg.me { background: #dcf8c6; align-self: flex-end; }
-        .chat-input-row { display: flex; gap: 5px; }
-        .chat-input-row input { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
-        .btn-send { background: var(--primaria); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; }
-
-        .star-rating { font-size: 38px; color: #ddd; text-align: center; margin: 20px 0; }
-        .star-rating span.active { color: var(--topo-texto); }
     </style>
 </head>
 <body>
+
+    <div id="splash">
+        <h2>MOBILIZE CAR</h2>
+        <p>Bem-vinda à sua melhor viagem</p>
+        <div class="loader"></div>
+    </div>
 
     <div class="header">
         <h1>MOBILIZE CAR</h1>
@@ -94,11 +99,11 @@
         <div class="car-options">
             <div id="card-eco" class="card active" onclick="selectType('eco')">
                 <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png">
-                <div class="card-data"><strong>Econômico</strong> <span id="p-eco">R$ 0,00</span></div>
+                <div style="font-size:12px"><strong>Econômico</strong> <span id="p-eco">R$ 0,00</span></div>
             </div>
             <div id="card-black" class="card" onclick="selectType('black')">
                 <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
-                <div class="card-data"><strong>Premium</strong> <span id="p-black">R$ 0,00</span></div>
+                <div style="font-size:12px"><strong>Premium</strong> <span id="p-black">R$ 0,00</span></div>
             </div>
         </div>
 
@@ -110,46 +115,44 @@
         <button class="btn-confirm" onclick="confirmarViagem()">Confirmar Mobilize</button>
         
         <div class="footer-powered">
-             POWERED BY <span>NATANAEL TEIXEIRA</span>
+            ⚡ POWERED BY <span>NATANAEL TEIXEIRA</span>
         </div>
     </div>
 
     <div id="modalChat" class="modal-overlay" onclick="fecharModal(event, 'modalChat')">
         <div class="modal-window">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0; color:var(--primaria)">Suporte Mobilize</h3>
-                <span style="cursor:pointer; font-size:20px;" onclick="document.getElementById('modalChat').style.display='none'">&times;</span>
-            </div>
-            <div class="chat-area" id="chatMsg">
-                <div class="msg bot">Olá! Como podemos ajudar hoje?</div>
-            </div>
-            <div class="chat-input-row">
-                <input type="text" id="chatInput" placeholder="Escreva aqui...">
-                <button class="btn-send" onclick="enviarMensagem()">➔</button>
+            <h3 style="color:var(--primaria)">Suporte</h3>
+            <div class="chat-area" id="chatMsg"><div class="msg bot">Olá! Como podemos ajudar?</div></div>
+            <div style="display:flex; gap:5px">
+                <input type="text" id="chatInput" placeholder="Mensagem..." style="flex:1; padding:10px; border-radius:20px; border:1px solid #ddd;">
+                <button onclick="enviarMensagem()" style="background:var(--primaria); color:white; border:none; border-radius:50%; width:40px;">➔</button>
             </div>
         </div>
     </div>
 
     <div id="modalAvaliar" class="modal-overlay" onclick="fecharModal(event, 'modalAvaliar')">
         <div class="modal-window" style="text-align: center;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0">Avaliar</h3>
-                <span style="cursor:pointer; font-size:20px;" onclick="document.getElementById('modalAvaliar').style.display='none'">&times;</span>
-            </div>
-            <div class="star-rating">
-                <span onclick="setStars(1)">★</span><span onclick="setStars(2)">★</span><span onclick="setStars(3)">★</span><span onclick="setStars(4)">★</span><span onclick="setStars(5)">★</span>
-            </div>
-            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
+            <h3>Avaliar Viagem</h3>
+            <div style="font-size:35px; color:#D4AF37; margin:15px">★★★★★</div>
+            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar</button>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // LÓGICA DA TELA DE BOAS VINDAS
+        window.onload = () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 800);
+            }, 3000); // 3 segundos de exibição
+        };
+
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 16);
-        var userMarker, km = 0, cat = "Econômico";
+        var userMarker, km = 0;
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
         map.locate({setView: true, maxZoom: 17});
         map.on('locationfound', e => {
             userMarker = L.circleMarker(e.latlng, {radius: 8, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 3}).addTo(map);
@@ -176,27 +179,14 @@
             if(inp.value) {
                 document.getElementById('chatMsg').innerHTML += `<div class="msg me">${inp.value}</div>`;
                 inp.value = '';
-                document.getElementById('chatMsg').scrollTop = document.getElementById('chatMsg').scrollHeight;
             }
-        }
-
-        function selectType(id) {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            document.getElementById('card-' + id).classList.add('active');
-            cat = id === 'eco' ? "Econômico" : "Premium";
         }
 
         function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
         function fecharModal(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
-        function setStars(n) {
-            let stars = document.querySelectorAll('.star-rating span');
-            stars.forEach((s, i) => s.classList.toggle('active', i < n));
-        }
-
         function confirmarViagem() {
-            if(km === 0) return alert("Por favor, informe seu destino!");
-            let carro = cat === "Econômico" ? "Kwid - MOB-2024" : "Corolla - LUX-5050";
-            alert(`✅ Mobilize Confirmado!\nMotorista: Maria Oliveira\nVeículo: ${carro}`);
+            if(km === 0) alert("Informe o destino!");
+            else alert("✅ Motorista Maria Oliveira está a caminho!");
         }
     </script>
 </body>
