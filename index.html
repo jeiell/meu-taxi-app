@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobilize Car | Feminino</title>
+    <title>Mobilize Car | Oficial</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root { 
@@ -17,6 +17,7 @@
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
+        /* Header e Busca */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
@@ -27,24 +28,45 @@
 
         #map { flex: 1; width: 100%; z-index: 1; }
 
+        /* Painel Inferior */
         .bottom-panel { background: white; padding: 15px; border-radius: 20px 20px 0 0; z-index: 10; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
-
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
-        .card { flex: 1; display: flex; align-items: center; padding: 10px; border: 2px solid #f0f0f0; border-radius: 12px; transition: 0.2s; }
+        .card { flex: 1; display: flex; align-items: center; padding: 10px; border: 2px solid #f0f0f0; border-radius: 12px; }
         .card.active { border-color: var(--primaria); background: #fffcfd; }
         .card img { width: 35px; margin-right: 10px; }
-        .card-info { flex: 1; }
-        .card-info strong { font-size: 14px; display: block; }
-        .price { font-weight: bold; font-size: 15px; color: var(--preto); }
+        .price { font-weight: bold; font-size: 15px; }
 
         .interaction-bar { display: flex; gap: 10px; margin-bottom: 12px; }
-        .inter-btn { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; background: #f5f5f5; border-radius: 10px; color: #555; font-size: 13px; font-weight: bold; border: none; }
+        .inter-btn { flex: 1; padding: 10px; background: #f5f5f5; border-radius: 10px; color: #555; font-size: 13px; font-weight: bold; border: none; }
 
         .confirm-container { width: 100%; padding: 0 10px; }
         .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 15px; border-radius: 15px; border: none; font-size: 16px; font-weight: bold; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 85%; max-width: 320px; text-align: center; }
+        /* MODAIS ESTILO WHATSAPP/FLUTUANTE */
+        .modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.4); z-index: 2000; align-items: flex-end; 
+        }
+        .modal-window { 
+            background: white; width: 100%; border-radius: 25px 25px 0 0; 
+            padding: 20px; animation: slideUp 0.3s ease-out; max-height: 80vh; overflow-y: auto;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .modal-header h3 { margin: 0; color: var(--primaria); font-size: 18px; }
+        .close-x { font-size: 24px; cursor: pointer; color: #aaa; }
+
+        /* Estilo Chat Bolhas */
+        .chat-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 14px; line-height: 1.4; }
+        .msg.bot { background: #f1f1f1; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.user { background: #e1ffc7; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+        /* Estilo Estrelas */
+        .star-rating { font-size: 40px; color: #ddd; text-align: center; margin: 20px 0; }
+        .star-rating span { cursor: pointer; transition: 0.2s; }
+        .star-rating span.active { color: var(--topo-texto); }
     </style>
 </head>
 <body>
@@ -55,7 +77,7 @@
     </div>
 
     <div class="search-box">
-        <input type="text" id="destInput" placeholder="Aonde vamos hoje?">
+        <input type="text" id="destInput" placeholder="Para onde vamos?">
         <button onclick="buscarDestino()">🔍</button>
     </div>
 
@@ -63,21 +85,21 @@
 
     <div class="bottom-panel">
         <div class="car-options">
-            <div id="card-eco" class="card active" onclick="selectType('eco', 2.80)">
+            <div id="card-eco" class="card active" onclick="selectType('eco')">
                 <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png">
-                <div class="card-info"><strong>Econômico</strong></div>
+                <div style="flex:1"><strong>Econômico</strong></div>
                 <div class="price" id="p-eco">R$ 0,00</div>
             </div>
-            <div id="card-black" class="card" onclick="selectType('black', 4.50)">
+            <div id="card-black" class="card" onclick="selectType('black')">
                 <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png">
-                <div class="card-info"><strong>Premium</strong></div>
+                <div style="flex:1"><strong>Premium</strong></div>
                 <div class="price" id="p-black">R$ 0,00</div>
             </div>
         </div>
 
         <div class="interaction-bar">
-            <button class="inter-btn" onclick="alert('Chat aberto! Como podemos ajudar?')">💬 Chat</button>
-            <button class="inter-btn" onclick="alert('Avaliação aberta!')">⭐ Avaliar</button>
+            <button class="inter-btn" onclick="toggleModal('modalChat')">💬 Chat</button>
+            <button class="inter-btn" onclick="toggleModal('modalAvaliar')">⭐ Avaliar</button>
         </div>
 
         <div class="confirm-container">
@@ -85,17 +107,46 @@
         </div>
     </div>
 
+    <div id="modalChat" class="modal-overlay" onclick="fecharModal(event, 'modalChat')">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Conversa com Suporte</h3>
+                <span class="close-x" onclick="document.getElementById('modalChat').style.display='none'">&times;</span>
+            </div>
+            <div class="chat-box">
+                <div class="msg bot">Olá! Como podemos ajudar você hoje?</div>
+                <div class="msg bot">Nossas motoristas parceiras estão prontas para te atender.</div>
+            </div>
+            <div style="display:flex; gap:5px;">
+                <input type="text" placeholder="Digite sua mensagem..." style="flex:1; padding:10px; border-radius:20px; border:1px solid #ddd; outline:none;">
+                <button style="background:var(--primaria); color:white; border:none; border-radius:50%; width:40px; height:40px;">➔</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAvaliar" class="modal-overlay" onclick="fecharModal(event, 'modalAvaliar')">
+        <div class="modal-window" style="text-align: center;">
+            <div class="modal-header">
+                <h3>Avalie sua Viagem</h3>
+                <span class="close-x" onclick="document.getElementById('modalAvaliar').style.display='none'">&times;</span>
+            </div>
+            <p>Sua opinião é muito importante para a segurança de todas.</p>
+            <div class="star-rating">
+                <span onclick="setStars(1)">★</span><span onclick="setStars(2)">★</span><span onclick="setStars(3)">★</span><span onclick="setStars(4)">★</span><span onclick="setStars(5)">★</span>
+            </div>
+            <button class="btn-confirm" onclick="alert('Obrigada pela avaliação!'); document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Zoom inicial ajustado para 16 (mais perto)
         var map = L.map('map', { zoomControl: false }).setView([-5.52, -47.47], 16);
-        var userMarker, km = 0, catAtual = "Econômico";
+        var userMarker, km = 0, cat = "Econômico";
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         map.locate({setView: true, maxZoom: 17});
         map.on('locationfound', e => {
-            if (userMarker) map.removeLayer(userMarker);
             userMarker = L.circleMarker(e.latlng, {radius: 8, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 3}).addTo(map);
         });
 
@@ -107,38 +158,35 @@
             if(data.length > 0) {
                 let local = [data[0].lat, data[0].lon];
                 L.marker(local).addTo(map);
-                map.flyTo(local, 17); // Zoom de aproximação ao buscar
+                map.flyTo(local, 17);
                 L.polyline([userMarker.getLatLng(), local], {color: '#c71585', weight: 4, dashArray: '8, 8'}).addTo(map);
                 km = userMarker.getLatLng().distanceTo(local) / 1000;
-                atualizarPrecos();
+                document.getElementById('p-eco').innerText = "R$ " + (km * 2.8 + 6).toFixed(2);
+                document.getElementById('p-black').innerText = "R$ " + (km * 4.5 + 10).toFixed(2);
             }
         }
 
-        function selectType(id, rate) {
+        function selectType(id) {
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             document.getElementById('card-' + id).classList.add('active');
-            catAtual = id === 'eco' ? "Econômico (Vermelho)" : "Premium (Preto)";
-            atualizarPrecos();
+            cat = id === 'eco' ? "Econômico" : "Premium";
         }
 
-        function atualizarPrecos() {
-            document.getElementById('p-eco').innerText = "R$ " + (km * 2.8 + 6).toFixed(2);
-            document.getElementById('p-black').innerText = "R$ " + (km * 4.5 + 10).toFixed(2);
+        function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
+        
+        function fecharModal(e, id) {
+            if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none';
+        }
+
+        function setStars(n) {
+            let stars = document.querySelectorAll('.star-rating span');
+            stars.forEach((s, i) => s.classList.toggle('active', i < n));
         }
 
         function confirmarViagem() {
-            if(km === 0) {
-                alert("Por favor, busque um destino primeiro!");
-            } else {
-                // Simulação de dados que virão do cadastro de motoristas
-                let carro = {
-                    modelo: catAtual === "Econômico (Vermelho)" ? "Renault Kwid - Branco" : "Toyota Corolla - Preto",
-                    placa: catAtual === "Econômico (Vermelho)" ? "MOB-2024" : "LUX-5050",
-                    motorista: "Maria Oliveira"
-                };
-                
-                alert(`🚗 Corrida Confirmada!\n\nMotorista: ${carro.motorista}\nVeículo: ${carro.modelo}\nPlaca: ${carro.placa}\n\nSua motorista chegará em instantes.`);
-            }
+            if(km === 0) return alert("Busque um destino primeiro!");
+            let carro = cat === "Econômico" ? "Renault Kwid - MOB-2024" : "Toyota Corolla - LUX-5050";
+            alert(`✅ Confirmado!\nMotorista: Maria Oliveira\nVeículo: ${carro}`);
         }
     </script>
 </body>
