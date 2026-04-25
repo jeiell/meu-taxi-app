@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4a148c">
+    
     <title>Mobilize Car | Oficial</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
@@ -11,67 +16,65 @@
             --topo-texto: #D4AF37; 
             --fundo-app: #fff0f5; 
             --primaria: #c71585; 
+            --preto: #1a1a1a; 
         }
 
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
+        /* Interface Principal */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 1001; }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
 
         .search-box { position: absolute; top: 60px; width: 90%; left: 5%; z-index: 1000; display: flex; }
-        .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.1); outline: none; }
+        .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); outline: none; font-size: 14px; }
         .search-box button { background: var(--primaria); color: white; border: none; border-radius: 0 20px 20px 0; width: 45px; cursor: pointer; }
 
         #map { flex: 1; width: 100%; z-index: 1; }
 
-        /* Painel Inferior Reestruturado */
-        .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 10; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+        /* Painel Inferior */
+        .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.08); }
 
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
-        
-        /* Cartões Verticais */
         .card { 
             flex: 1; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            justify-content: center;
             padding: 12px 5px; 
             border: 2px solid #f0f0f0; 
             border-radius: 15px; 
             text-align: center;
-            transition: 0.2s;
         }
         .card.active { border-color: var(--primaria); background: #fffcfd; }
-        
-        .card img { width: 45px; height: auto; margin-bottom: 8px; }
-        
-        .card-data { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 5px; 
-            width: 100%; 
-            border-top: 1px solid #f9f9f9;
-            padding-top: 5px;
-        }
-        .card-data strong { font-size: 13px; color: #333; }
-        .card-data span { font-weight: bold; font-size: 13px; color: var(--primaria); }
+        .card img { width: 42px; margin-bottom: 8px; }
+        .card-data { display: flex; justify-content: center; gap: 5px; width: 100%; border-top: 1px solid #f9f9f9; padding-top: 6px; }
+        .card-data strong { font-size: 12px; color: #333; }
+        .card-data span { font-weight: bold; font-size: 12px; color: var(--primaria); }
 
-        .interaction-bar { display: flex; gap: 10px; margin-bottom: 12px; }
+        .interaction-bar { display: flex; gap: 10px; margin-bottom: 15px; }
         .inter-btn { flex: 1; padding: 12px; background: #f5f5f5; border-radius: 12px; color: #555; font-size: 13px; font-weight: bold; border: none; }
 
-        .confirm-container { width: 100%; padding: 0 5px; }
-        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; }
+        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; box-shadow: 0 4px 10px rgba(199, 21, 133, 0.3); }
 
-        /* Modais */
+        /* ASSINATURA POWERED BY */
+        .footer-powered { 
+            text-align: center; 
+            font-size: 10px; 
+            color: #ccc; 
+            padding-top: 12px; 
+            letter-spacing: 1.5px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        /* Modais Deslizantes */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; align-items: flex-end; }
-        .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 25px; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .star-rating { font-size: 35px; color: #ddd; text-align: center; margin: 15px 0; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .star-rating { font-size: 38px; color: #ddd; text-align: center; margin: 20px 0; }
         .star-rating span.active { color: var(--topo-texto); }
     </style>
 </head>
@@ -112,26 +115,28 @@
             <button class="inter-btn" onclick="toggleModal('modalAvaliar')">⭐ Avaliar</button>
         </div>
 
-        <div class="confirm-container">
-            <button class="btn-confirm" onclick="confirmarViagem()">Confirmar Mobilize</button>
+        <button class="btn-confirm" onclick="confirmarViagem()">Confirmar Mobilize</button>
+        
+        <div class="footer-powered">
+            POWERED BY NATANAEL TEIXEIRA
         </div>
     </div>
 
     <div id="modalChat" class="modal-overlay" onclick="fecharModal(event, 'modalChat')">
         <div class="modal-window">
-            <div class="modal-header"><h3>Chat</h3><span onclick="document.getElementById('modalChat').style.display='none'">&times;</span></div>
-            <p style="font-size:14px; color:#666">Suporte Mobilize: Olá! Como podemos ajudar?</p>
-            <input type="text" placeholder="Mensagem..." style="width:100%; padding:12px; border-radius:20px; border:1px solid #ddd; outline:none;">
+            <div class="modal-header"><h3>Suporte</h3><span onclick="document.getElementById('modalChat').style.display='none'">&times;</span></div>
+            <p style="font-size:14px; color:#666">Olá! Como podemos ajudar hoje?</p>
+            <input type="text" placeholder="Digite sua dúvida..." style="width:100%; padding:14px; border-radius:25px; border:1px solid #ddd; outline:none;">
         </div>
     </div>
 
     <div id="modalAvaliar" class="modal-overlay" onclick="fecharModal(event, 'modalAvaliar')">
         <div class="modal-window" style="text-align: center;">
-            <div class="modal-header"><h3>Avalie</h3><span onclick="document.getElementById('modalAvaliar').style.display='none'">&times;</span></div>
+            <div class="modal-header"><h3>Avaliar</h3><span onclick="document.getElementById('modalAvaliar').style.display='none'">&times;</span></div>
             <div class="star-rating">
                 <span onclick="setStars(1)">★</span><span onclick="setStars(2)">★</span><span onclick="setStars(3)">★</span><span onclick="setStars(4)">★</span><span onclick="setStars(5)">★</span>
             </div>
-            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar</button>
+            <button class="btn-confirm" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
         </div>
     </div>
 
@@ -177,9 +182,9 @@
         }
 
         function confirmarViagem() {
-            if(km === 0) return alert("Busque um destino!");
+            if(km === 0) return alert("Por favor, informe seu destino!");
             let carro = cat === "Econômico" ? "Kwid - MOB-2024" : "Corolla - LUX-5050";
-            alert(`✅ Confirmado!\nMotorista: Maria Oliveira\nVeículo: ${carro}`);
+            alert(`✅ Mobilize Confirmado!\nMotorista: Maria Oliveira\nVeículo: ${carro}`);
         }
     </script>
 </body>
