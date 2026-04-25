@@ -1,16 +1,24 @@
 {
   "name": "Mobilize Car Oficial",
   "short_name": "Mobilize",
+  "description": "Transporte Seguro e Confortável",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#4a148c",
   "theme_color": "#4a148c",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icon-1024.png",
       "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
