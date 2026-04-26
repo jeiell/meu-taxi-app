@@ -31,7 +31,7 @@
             font-family: sans-serif; background: var(--fundo-app); 
         }
 
-        /* SPLASH SCREEN */
+        /* SPLASH SCREEN COM CARRINHO E FRASE */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
@@ -39,10 +39,17 @@
             z-index: 9999; transition: opacity 0.8s ease;
         }
         #splash h2 { color: var(--topo-texto); font-size: 28px; letter-spacing: 4px; margin: 0; font-weight: bold; }
-        .loading-zone { width: 280px; margin-top: 40px; }
-        .bar-track { width: 100%; height: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden; background: rgba(255,255,255,0.05); }
+        #splash p { color: white; font-size: 14px; margin-top: 10px; opacity: 0.9; }
+        
+        .loading-zone { width: 280px; margin-top: 40px; position: relative; }
+        .bar-track { width: 100%; height: 8px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden; background: rgba(255,255,255,0.05); margin-bottom: 8px; }
         .progress-bar { height: 100%; width: 0%; background: white; animation: fillBar 3.5s linear forwards; }
-        @keyframes fillBar { 0% { width: 0%; } 100% { width: 100%; } }
+        
+        .car-track { width: 100%; height: 30px; position: relative; }
+        .car-loader { position: absolute; width: 38px; filter: brightness(0) invert(1); transform: scaleX(-1); left: -50px; animation: driveCar 3.5s linear forwards; }
+
+        @keyframes fillBar { 0% { width: 0%; } 85% { width: 85%; } 100% { width: 100%; } }
+        @keyframes driveCar { 0% { left: -50px; } 85% { left: 85%; } 100% { left: 120%; } }
 
         /* INTERFACE */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -91,8 +98,12 @@
 
     <div id="splash">
         <h2>MOBILIZE CAR</h2>
+        <p>Sua viagem segura começa aqui</p>
         <div class="loading-zone">
             <div class="bar-track"><div class="progress-bar"></div></div>
+            <div class="car-track">
+                <img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" class="car-loader">
+            </div>
         </div>
     </div>
 
@@ -168,7 +179,7 @@
             setTimeout(() => {
                 document.getElementById('splash').style.opacity = '0';
                 setTimeout(() => document.getElementById('splash').style.display = 'none', 800);
-            }, 3000); 
+            }, 3500); 
         };
 
         var map = L.map('map', { zoomControl: false, touchRotate: true, rotate: true }).setView([-5.52, -47.47], 15);
@@ -185,7 +196,7 @@
         async function buscarDestino() {
             let input = document.getElementById('destInput').value;
             if(!input || !userLocation) return;
-            
+            saveToHistory(input);
             document.getElementById('searchHistory').style.display = 'none';
             if (routingControl) { map.removeControl(routingControl); }
             if (destMarker) { map.removeLayer(destMarker); }
@@ -219,7 +230,6 @@
 
         function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
         function fecharModalExterno(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
-        
         function acionarSOS() { toggleModal('modalSOS'); }
         function dispararAlertaReal() { alert("🚨 SOS ENVIADO! Autoridades notificadas."); document.getElementById('modalSOS').style.display = 'none'; }
 
@@ -244,20 +254,25 @@
 
         function confirmarViagem() { alert("✅ Mobilize Confirmado!"); }
 
+        function saveToHistory(q) {
+            let h = JSON.parse(localStorage.getItem('mobilize_history') || '[]');
+            if(!h.includes(q)) { h.unshift(q); if(h.length > 5) h.pop(); localStorage.setItem('mobilize_history', JSON.stringify(h)); }
+        }
+
         function showHistory() {
-            let history = JSON.parse(localStorage.getItem('mobilize_history') || '[]');
-            let container = document.getElementById('searchHistory');
-            if(history.length > 0) {
-                container.innerHTML = history.map(h => `<div class="history-item" onclick="selectHistory('${h}')">🕒 ${h}</div>`).join('');
-                container.style.display = 'block';
+            let h = JSON.parse(localStorage.getItem('mobilize_history') || '[]');
+            let c = document.getElementById('searchHistory');
+            if(h.length > 0) {
+                c.innerHTML = h.map(i => `<div class="history-item" onclick="selectHistory('${i}')">🕒 ${i}</div>`).join('');
+                c.style.display = 'block';
             }
         }
 
-        function selectHistory(val) {
-            document.getElementById('destInput').value = val;
-            document.getElementById('searchHistory').style.display = 'none';
-            buscarDestino();
-        }
+        function selectHistory(val) { document.getElementById('destInput').value = val; document.getElementById('searchHistory').style.display = 'none'; buscarDestino(); }
+
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.search-container')) document.getElementById('searchHistory').style.display = 'none';
+        });
     </script>
 </body>
 </html>
