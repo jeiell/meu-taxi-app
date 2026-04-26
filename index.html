@@ -230,8 +230,17 @@
 
         function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
         function fecharModalExterno(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        
         function acionarSOS() { toggleModal('modalSOS'); }
-        function dispararAlertaReal() { alert("🚨 SOS ENVIADO! Autoridades notificadas."); document.getElementById('modalSOS').style.display = 'none'; }
+        
+        function dispararAlertaReal() { 
+            // VIBRAÇÃO INSERIDA AQUI
+            if (navigator.vibrate) {
+                navigator.vibrate([500, 200, 500, 200, 500]); 
+            }
+            alert("🚨 SOS ENVIADO! Autoridades notificadas."); 
+            document.getElementById('modalSOS').style.display = 'none'; 
+        }
 
         function enviarMensagem() {
             let inp = document.getElementById('chatInput');
