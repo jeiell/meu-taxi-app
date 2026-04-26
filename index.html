@@ -25,7 +25,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
-        /* SPLASH SCREEN */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
@@ -43,7 +42,6 @@
         @keyframes fillBar { 0% { width: 0%; } 85% { width: 85%; } 100% { width: 100%; } }
         @keyframes driveCar { 0% { left: -50px; } 85% { left: 85%; } 100% { left: 120%; } }
 
-        /* INTERFACE */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
@@ -51,7 +49,6 @@
         #map { flex: 1; width: 100%; z-index: 1; }
         .leaflet-routing-container { display: none !important; }
 
-        /* BUSCA E HISTÓRICO */
         .search-container { position: absolute; top: 65px; width: 90%; left: 5%; z-index: 1000; }
         .search-box { display: flex; width: 100%; }
         .search-box input { flex: 1; padding: 12px; border-radius: 20px 0 0 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); outline: none; }
@@ -62,8 +59,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-height: 150px; overflow-y: auto;
         }
         .history-item { padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; color: #555; cursor: pointer; }
-        .history-item:last-child { border: none; }
-        
+
         .btn-sos { position: absolute; right: 15px; bottom: 310px; width: 48px; height: 48px; background: var(--sos); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 999; border: 2px solid white; cursor: pointer; }
 
         .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
@@ -135,18 +131,53 @@
         <div class="footer-powered">FEITO POR NATANAEL TEIXEIRA</div>
     </div>
 
+    <div id="modalChat" class="modal-overlay" onmousedown="fecharModalExterno(event, 'modalChat')">
+        <div class="modal-window" onmousedown="event.stopPropagation()">
+            <h3 style="color:var(--primaria); margin-top:0;">Suporte</h3>
+            <div class="chat-area" id="chatMsg"><div class="msg bot">Olá! Como podemos ajudar na sua corrida hoje?</div></div>
+            <div style="display:flex; gap:5px">
+                <input type="text" id="chatInput" placeholder="Mensagem..." style="flex:1; padding:12px; border-radius:20px; border:1px solid #ddd; outline:none;">
+                <button onclick="enviarMensagem()" style="background:var(--primaria); color:white; border:none; border-radius:50%; width:40px; height:40px;">➔</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalSOS" class="modal-overlay" onmousedown="fecharModalExterno(event, 'modalSOS')">
+        <div class="modal-window" style="text-align:center;">
+            <h2 style="color:red; margin-top:0;">ALERTA SOS</h2>
+            <p style="font-size: 14px;">Deseja acionar a emergência? Autoridades e Central serão notificadas imediatamente.</p>
+            <button class="btn-confirm" style="background:red; margin-bottom:10px;" onclick="dispararAlertaReal()">SIM, AJUDA!</button>
+            <button class="inter-btn" style="width:100%" onclick="document.getElementById('modalSOS').style.display='none'">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="modalAvaliar" class="modal-overlay" onmousedown="fecharModalExterno(event, 'modalAvaliar')">
+        <div class="modal-window" style="text-align:center;">
+            <h3>Avaliar Viagem</h3>
+            <div class="stars" id="starContainer">
+                <span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span><span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span>
+            </div>
+            <button class="btn-confirm" style="margin-top:20px;" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
     
     <script>
-        // ... (Service Worker e Splash permanecem iguais)
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
-        var map = L.map('map', { 
-            zoomControl: false,
-            touchRotate: true, 
-            rotate: true 
-        }).setView([-5.52, -47.47], 15);
-        
+        window.onload = () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash');
+                if(splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.style.display = 'none', 800);
+                }
+            }, 3500); 
+        };
+
+        var map = L.map('map', { zoomControl: false, touchRotate: true, rotate: true }).setView([-5.52, -47.47], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         var userLocation, routingControl, destMarker;
@@ -157,7 +188,6 @@
             L.circleMarker(e.latlng, {radius: 7, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 2}).addTo(map);
         });
 
-        // LÓGICA DE HISTÓRICO
         function saveToHistory(query) {
             let history = JSON.parse(localStorage.getItem('mobilize_history') || '[]');
             if(!history.includes(query)) {
@@ -182,29 +212,25 @@
             buscarDestino();
         }
 
-        // BUSCA MELHORADA POR NOME ESPECÍFICO
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.search-container')) document.getElementById('searchHistory').style.display = 'none';
+        });
+
         async function buscarDestino() {
             let input = document.getElementById('destInput').value;
             if(!input || !userLocation) return;
-            
             saveToHistory(input);
-            document.getElementById('searchHistory').style.display = 'none';
-
             if (routingControl) { map.removeControl(routingControl); }
             if (destMarker) { map.removeLayer(destMarker); }
 
-            // AJUSTE NA API: Adicionamos viewbox para priorizar a área próxima ao usuário
             let lat = userLocation.lat;
             let lon = userLocation.lng;
-            // Cria uma "janela" de busca de ~50km ao redor do usuário
             let viewbox = `${lon-0.5},${lat+0.5},${lon+0.5},${lat-0.5}`;
-
-            let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&bounded=1&viewbox=${viewbox}&addressdetails=1`;
+            let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&bounded=1&viewbox=${viewbox}`;
             
             let res = await fetch(url);
             let data = await res.json();
 
-            // Se não achou nada perto, tenta uma busca global sem limites
             if(data.length === 0) {
                 res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}`);
                 data = await res.json();
@@ -213,32 +239,48 @@
             if(data.length > 0) {
                 let destLatLng = L.latLng(data[0].lat, data[0].lon);
                 destMarker = L.marker(destLatLng).addTo(map);
-                
                 routingControl = L.Routing.control({
-                    waypoints: [L.latLng(userLocation.lat, userLocation.lng), destLatLng],
-                    lineOptions: { styles: [{ color: '#c71585', weight: 6, opacity: 0.7 }] },
+                    waypoints: [userLocation, destLatLng],
+                    lineOptions: { styles: [{ color: '#c71585', weight: 6 }] },
                     createMarker: function() { return null; },
                     addWaypoints: false,
-                    draggableWaypoints: false,
                     show: false
                 }).addTo(map);
 
                 routingControl.on('routesfound', function(e) {
                     var dist = e.routes[0].summary.totalDistance / 1000;
-                    let precoEco = (dist * 2.8 + 6);
-                    let precoPremium = (dist * 4.5 + 8);
-                    if (precoEco < 10) precoEco = 10;
-                    if (precoPremium < 12) precoPremium = 12;
-                    document.getElementById('p-eco').innerText = "R$ " + precoEco.toFixed(2);
-                    document.getElementById('p-black').innerText = "R$ " + precoPremium.toFixed(2);
+                    let pEco = (dist * 2.8 + 6);
+                    let pBlack = (dist * 4.5 + 8);
+                    if (pEco < 10) pEco = 10;
+                    if (pBlack < 12) pBlack = 12;
+                    document.getElementById('p-eco').innerText = "R$ " + pEco.toFixed(2);
+                    document.getElementById('p-black').innerText = "R$ " + pBlack.toFixed(2);
                     map.fitBounds(L.latLngBounds([userLocation, destLatLng]), {padding: [80, 80]});
                 });
-            } else {
-                alert("Local não encontrado. Tente ser um pouco mais específico.");
             }
         }
 
-        // ... (Restante das funções setRating, toggleModal, etc permanecem iguais)
+        function setRating(n) {
+            let stars = document.querySelectorAll('.stars span');
+            stars.forEach((s, i) => i < n ? s.classList.add('active') : s.classList.remove('active'));
+        }
+        function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function fecharModalExterno(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        function acionarSOS() { if (navigator.vibrate) navigator.vibrate(150); toggleModal('modalSOS'); }
+        function dispararAlertaReal() { alert("🚨 SOS ENVIADO!"); toggleModal('modalSOS'); }
+        function enviarMensagem() {
+            let inp = document.getElementById('chatInput');
+            if(inp.value) {
+                document.getElementById('chatMsg').innerHTML += `<div class="msg me">${inp.value}</div>`;
+                inp.value = '';
+                document.getElementById('chatMsg').scrollTop = 9999;
+            }
+        }
+        function selectType(id) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.getElementById('card-' + id).classList.add('active');
+        }
+        function confirmarViagem() { alert("✅ Mobilize Confirmado!"); }
     </script>
 </body>
 </html>
