@@ -31,6 +31,7 @@
             font-family: sans-serif; background: var(--fundo-app); 
         }
 
+        /* SPLASH SCREEN */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
@@ -43,6 +44,7 @@
         .progress-bar { height: 100%; width: 0%; background: white; animation: fillBar 3.5s linear forwards; }
         @keyframes fillBar { 0% { width: 0%; } 100% { width: 100%; } }
 
+        /* INTERFACE */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .header h1 { margin: 0; font-size: 18px; color: var(--topo-texto); }
         
@@ -60,7 +62,7 @@
         }
         .history-item { padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; cursor: pointer; }
 
-        .btn-sos { position: absolute; right: 15px; bottom: 310px; width: 48px; height: 48px; background: var(--sos); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; z-index: 999; border: 2px solid white; }
+        .btn-sos { position: absolute; right: 15px; bottom: 310px; width: 48px; height: 48px; background: var(--sos); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; z-index: 999; border: 2px solid white; cursor: pointer; }
 
         .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
@@ -76,6 +78,7 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; }
         .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 25px; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
         .chat-area { height: 150px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px; padding: 5px; }
         .msg { padding: 8px; border-radius: 10px; font-size: 13px; max-width: 80%; }
         .msg.bot { background: #eee; align-self: flex-start; }
@@ -127,6 +130,15 @@
         <div class="footer-powered">FEITO POR NATANAEL TEIXEIRA</div>
     </div>
 
+    <div id="modalSOS" class="modal-overlay" onclick="fecharModalExterno(event, 'modalSOS')">
+        <div class="modal-window" style="text-align:center;">
+            <h2 style="color:red; margin-top:0;">ALERTA SOS</h2>
+            <p style="font-size: 14px;">Deseja acionar a emergência? Autoridades e Central serão notificadas imediatamente.</p>
+            <button class="btn-confirm" style="background:red; margin-bottom:10px;" onclick="dispararAlertaReal()">SIM, PRECISO DE AJUDA!</button>
+            <button class="inter-btn" style="width:100%" onclick="document.getElementById('modalSOS').style.display='none'">Cancelar</button>
+        </div>
+    </div>
+
     <div id="modalChat" class="modal-overlay" onclick="fecharModalExterno(event, 'modalChat')">
         <div class="modal-window" onclick="event.stopPropagation()">
             <h3 style="color:var(--primaria); margin-top:0;">Suporte</h3>
@@ -170,14 +182,67 @@
             L.circleMarker(e.latlng, {radius: 7, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 2}).addTo(map);
         });
 
-        function saveToHistory(query) {
-            let history = JSON.parse(localStorage.getItem('mobilize_history') || '[]');
-            if(!history.includes(query)) {
-                history.unshift(query);
-                if(history.length > 5) history.pop();
-                localStorage.setItem('mobilize_history', JSON.stringify(history));
+        async function buscarDestino() {
+            let input = document.getElementById('destInput').value;
+            if(!input || !userLocation) return;
+            
+            document.getElementById('searchHistory').style.display = 'none';
+            if (routingControl) { map.removeControl(routingControl); }
+            if (destMarker) { map.removeLayer(destMarker); }
+
+            let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&limit=1`;
+            let res = await fetch(url);
+            let data = await res.json();
+
+            if(data.length > 0) {
+                let destLatLng = L.latLng(data[0].lat, data[0].lon);
+                destMarker = L.marker(destLatLng).addTo(map);
+                routingControl = L.Routing.control({
+                    waypoints: [userLocation, destLatLng],
+                    lineOptions: { styles: [{ color: '#2672ec', weight: 6 }] },
+                    createMarker: function() { return null; },
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    show: false
+                }).addTo(map);
+
+                routingControl.on('routesfound', function(e) {
+                    var dist = e.routes[0].summary.totalDistance / 1000;
+                    let precoEco = Math.max(10, (dist * 2.8 + 6));
+                    let precoPremium = Math.max(12, (dist * 4.5 + 8));
+                    document.getElementById('p-eco').innerText = "R$ " + precoEco.toFixed(2);
+                    document.getElementById('p-black').innerText = "R$ " + precoPremium.toFixed(2);
+                    map.fitBounds(L.latLngBounds([userLocation, destLatLng]), {padding: [80, 80]});
+                });
             }
         }
+
+        function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function fecharModalExterno(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        
+        function acionarSOS() { toggleModal('modalSOS'); }
+        function dispararAlertaReal() { alert("🚨 SOS ENVIADO! Autoridades notificadas."); document.getElementById('modalSOS').style.display = 'none'; }
+
+        function enviarMensagem() {
+            let inp = document.getElementById('chatInput');
+            if(inp.value) {
+                document.getElementById('chatMsg').innerHTML += `<div class="msg me">${inp.value}</div>`;
+                inp.value = '';
+                document.getElementById('chatMsg').scrollTop = 9999;
+            }
+        }
+
+        function setRating(n) {
+            let stars = document.querySelectorAll('.stars span');
+            stars.forEach((s, i) => { i < n ? s.classList.add('active') : s.classList.remove('active'); });
+        }
+
+        function selectType(id) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.getElementById('card-' + id).classList.add('active');
+        }
+
+        function confirmarViagem() { alert("✅ Mobilize Confirmado!"); }
 
         function showHistory() {
             let history = JSON.parse(localStorage.getItem('mobilize_history') || '[]');
@@ -193,79 +258,6 @@
             document.getElementById('searchHistory').style.display = 'none';
             buscarDestino();
         }
-
-        async function buscarDestino() {
-            let input = document.getElementById('destInput').value;
-            if(!input || !userLocation) return;
-            
-            saveToHistory(input);
-            document.getElementById('searchHistory').style.display = 'none';
-
-            if (routingControl) { map.removeControl(routingControl); }
-            if (destMarker) { map.removeLayer(destMarker); }
-
-            let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&limit=1`;
-            
-            let res = await fetch(url);
-            let data = await res.json();
-
-            if(data.length > 0) {
-                let destLatLng = L.latLng(data[0].lat, data[0].lon);
-                destMarker = L.marker(destLatLng).addTo(map);
-                
-                routingControl = L.Routing.control({
-                    waypoints: [userLocation, destLatLng],
-                    lineOptions: { styles: [{ color: '#2672ec', weight: 6 }] },
-                    createMarker: function() { return null; },
-                    addWaypoints: false,
-                    draggableWaypoints: false,
-                    show: false
-                }).addTo(map);
-
-                routingControl.on('routesfound', function(e) {
-                    var dist = e.routes[0].summary.totalDistance / 1000;
-                    let precoEco = (dist * 2.8 + 6);
-                    let precoPremium = (dist * 4.5 + 8);
-                    if (precoEco < 10) precoEco = 10;
-                    if (precoPremium < 12) precoPremium = 12;
-                    document.getElementById('p-eco').innerText = "R$ " + precoEco.toFixed(2);
-                    document.getElementById('p-black').innerText = "R$ " + precoPremium.toFixed(2);
-                    map.fitBounds(L.latLngBounds([userLocation, destLatLng]), {padding: [80, 80]});
-                });
-            }
-        }
-
-        function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function fecharModalExterno(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
-        
-        function enviarMensagem() {
-            let inp = document.getElementById('chatInput');
-            if(inp.value) {
-                document.getElementById('chatMsg').innerHTML += `<div class="msg me">${inp.value}</div>`;
-                inp.value = '';
-                document.getElementById('chatMsg').scrollTop = 9999;
-            }
-        }
-
-        function setRating(n) {
-            let stars = document.querySelectorAll('.stars span');
-            stars.forEach((s, i) => {
-                if(i < n) s.classList.add('active');
-                else s.classList.remove('active');
-            });
-        }
-
-        function selectType(id) {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            document.getElementById('card-' + id).classList.add('active');
-        }
-
-        function acionarSOS() { alert("🚨 SOS ENVIADO!"); }
-        function confirmarViagem() { alert("✅ Mobilize Confirmado!"); }
-
-        document.addEventListener('click', (e) => {
-            if(!e.target.closest('.search-container')) document.getElementById('searchHistory').style.display = 'none';
-        });
     </script>
 </body>
 </html>
