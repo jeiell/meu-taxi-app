@@ -25,6 +25,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; font-family: sans-serif; background: var(--fundo-app); }
 
+        /* SPLASH SCREEN */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
@@ -42,6 +43,7 @@
         @keyframes fillBar { 0% { width: 0%; } 85% { width: 85%; } 100% { width: 100%; } }
         @keyframes driveCar { 0% { left: -50px; } 85% { left: 85%; } 100% { left: 120%; } }
 
+        /* INTERFACE */
         .header { background: var(--topo-fundo); color: white; padding: 10px; text-align: center; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: var(--topo-texto); }
         .header p { margin: 0; font-size: 9px; text-transform: uppercase; opacity: 0.8; }
@@ -61,7 +63,7 @@
         }
         .history-item { padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; color: #555; cursor: pointer; }
         .history-item:last-child { border: none; }
-
+        
         .btn-sos { position: absolute; right: 15px; bottom: 310px; width: 48px; height: 48px; background: var(--sos); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 999; border: 2px solid white; cursor: pointer; }
 
         .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
@@ -130,7 +132,7 @@
             <button class="inter-btn" onclick="toggleModal('modalAvaliar')">⭐ Avaliar</button>
         </div>
         <button class="btn-confirm" onclick="confirmarViagem()">Confirmar Mobilize</button>
-        <div class="footer-powered">⚡ POWERED BY <span>NATANAEL TEIXEIRA</span></div>
+        <div class="footer-powered">FEITO POR NATANAEL</div>
     </div>
 
     <div id="modalChat" class="modal-overlay" onmousedown="fecharModalExterno(event, 'modalChat')">
@@ -174,13 +176,12 @@
                 document.getElementById('splash').style.opacity = '0';
                 setTimeout(() => document.getElementById('splash').style.display = 'none', 800);
             }, 3500); 
-            loadHistory();
         };
 
         // MAPA COM ROTAÇÃO POR TOUCH (PINÇA)
         var map = L.map('map', { 
             zoomControl: false,
-            touchRotate: true, // Ativa rotação por toque
+            touchRotate: true, 
             rotate: true 
         }).setView([-5.52, -47.47], 15);
         
@@ -194,7 +195,7 @@
             L.circleMarker(e.latlng, {radius: 7, color: '#fff', fillColor: '#c71585', fillOpacity: 1, weight: 2}).addTo(map);
         });
 
-        // LÓGICA DE HISTÓRICO (CACHE)
+        // LÓGICA DE CACHE / HISTÓRICO
         function saveToHistory(query) {
             let history = JSON.parse(localStorage.getItem('mobilize_history') || '[]');
             if(!history.includes(query)) {
@@ -251,12 +252,17 @@
 
                 routingControl.on('routesfound', function(e) {
                     var dist = e.routes[0].summary.totalDistance / 1000;
+                    
+                    // CÁLCULO COM PREÇO MÍNIMO (NATANAEL RULES)
                     let precoEco = (dist * 2.8 + 6);
                     let precoPremium = (dist * 4.5 + 8);
+
                     if (precoEco < 10) precoEco = 10;
                     if (precoPremium < 12) precoPremium = 12;
+
                     document.getElementById('p-eco').innerText = "R$ " + precoEco.toFixed(2);
                     document.getElementById('p-black').innerText = "R$ " + precoPremium.toFixed(2);
+
                     map.fitBounds(L.latLngBounds([userLocation, destLatLng]), {padding: [50, 50]});
                 });
             }
