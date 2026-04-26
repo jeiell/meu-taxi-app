@@ -64,10 +64,24 @@
 
         .bottom-panel { background: white; padding: 15px; border-radius: 25px 25px 0 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
         .car-options { display: flex; gap: 10px; margin-bottom: 12px; }
-        .card { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 5px; border: 2px solid #f0f0f0; border-radius: 15px; }
+        .card { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 5px; border: 2px solid #f0f0f0; border-radius: 15px; cursor: pointer;}
         .card.active { border-color: var(--primaria); background: #fffcfd; }
-        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; }
+        
+        .interaction-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+        .inter-btn { flex: 1; padding: 12px; background: #f5f5f5; border-radius: 12px; border: none; font-weight: bold; font-size: 13px; color: #555; cursor: pointer; }
+        .btn-confirm { width: 100%; background: var(--primaria); color: white; padding: 16px; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; cursor: pointer;}
         .footer-powered { text-align: center; font-size: 10px; color: #444; padding-top: 10px; font-weight: bold; }
+
+        /* MODAIS */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; }
+        .modal-window { background: white; width: 100%; border-radius: 25px 25px 0 0; padding: 25px; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .chat-area { height: 150px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px; padding: 5px; }
+        .msg { padding: 8px; border-radius: 10px; font-size: 13px; max-width: 80%; }
+        .msg.bot { background: #eee; align-self: flex-start; }
+        .msg.me { background: #dcf8c6; align-self: flex-end; }
+        .stars { font-size: 40px; color: #ccc; cursor: pointer; display: flex; justify-content: center; gap: 5px; }
+        .stars .active { color: #D4AF37; }
     </style>
 </head>
 <body>
@@ -92,7 +106,7 @@
     </div>
 
     <div id="map"></div>
-    <div class="btn-sos">SOS</div>
+    <div class="btn-sos" onclick="acionarSOS()">SOS</div>
 
     <div class="bottom-panel">
         <div class="car-options">
@@ -105,8 +119,33 @@
                 <div style="font-size:11px"><strong>Premium</strong> <br> <span id="p-black">R$ 0,00</span></div>
             </div>
         </div>
-        <button class="btn-confirm">Confirmar Mobilize</button>
+        <div class="interaction-bar">
+            <button class="inter-btn" onclick="toggleModal('modalChat')">💬 Chat</button>
+            <button class="inter-btn" onclick="toggleModal('modalAvaliar')">⭐ Avaliar</button>
+        </div>
+        <button class="btn-confirm" onclick="confirmarViagem()">Confirmar Mobilize</button>
         <div class="footer-powered">FEITO POR NATANAEL TEIXEIRA</div>
+    </div>
+
+    <div id="modalChat" class="modal-overlay" onclick="fecharModalExterno(event, 'modalChat')">
+        <div class="modal-window" onclick="event.stopPropagation()">
+            <h3 style="color:var(--primaria); margin-top:0;">Suporte</h3>
+            <div class="chat-area" id="chatMsg"><div class="msg bot">Olá, em que posso ajudar?</div></div>
+            <div style="display:flex; gap:5px">
+                <input type="text" id="chatInput" placeholder="Mensagem..." style="flex:1; padding:12px; border-radius:20px; border:1px solid #ddd; outline:none;">
+                <button onclick="enviarMensagem()" style="background:var(--primaria); color:white; border:none; border-radius:50%; width:40px; height:40px;">➔</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAvaliar" class="modal-overlay" onclick="fecharModalExterno(event, 'modalAvaliar')">
+        <div class="modal-window" style="text-align:center;">
+            <h3>Avaliar Viagem</h3>
+            <div class="stars" id="starContainer">
+                <span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span><span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span>
+            </div>
+            <button class="btn-confirm" style="margin-top:20px;" onclick="document.getElementById('modalAvaliar').style.display='none'">Enviar Avaliação</button>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -165,8 +204,6 @@
             if (routingControl) { map.removeControl(routingControl); }
             if (destMarker) { map.removeLayer(destMarker); }
 
-            // BUSCA GLOBAL (COMO GOOGLE MAPS)
-            // Removido o viewbox restrito para permitir achar cidades como Balsas
             let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&limit=1`;
             
             let res = await fetch(url);
@@ -178,7 +215,6 @@
                 
                 routingControl = L.Routing.control({
                     waypoints: [userLocation, destLatLng],
-                    // VOLTEI PARA A COR AZUL PADRÃO
                     lineOptions: { styles: [{ color: '#2672ec', weight: 6 }] },
                     createMarker: function() { return null; },
                     addWaypoints: false,
@@ -199,10 +235,33 @@
             }
         }
 
+        function toggleModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function fecharModalExterno(e, id) { if(e.target.className === 'modal-overlay') document.getElementById(id).style.display = 'none'; }
+        
+        function enviarMensagem() {
+            let inp = document.getElementById('chatInput');
+            if(inp.value) {
+                document.getElementById('chatMsg').innerHTML += `<div class="msg me">${inp.value}</div>`;
+                inp.value = '';
+                document.getElementById('chatMsg').scrollTop = 9999;
+            }
+        }
+
+        function setRating(n) {
+            let stars = document.querySelectorAll('.stars span');
+            stars.forEach((s, i) => {
+                if(i < n) s.classList.add('active');
+                else s.classList.remove('active');
+            });
+        }
+
         function selectType(id) {
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             document.getElementById('card-' + id).classList.add('active');
         }
+
+        function acionarSOS() { alert("🚨 SOS ENVIADO!"); }
+        function confirmarViagem() { alert("✅ Mobilize Confirmado!"); }
 
         document.addEventListener('click', (e) => {
             if(!e.target.closest('.search-container')) document.getElementById('searchHistory').style.display = 'none';
